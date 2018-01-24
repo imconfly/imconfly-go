@@ -20,6 +20,37 @@ Status
 
 ```
 
+Configuration
+=============
+
+Environment variables
+---------------------
+
+Deoyment-specific configuration.
+
+* ``IFG_TRANSFORMS_CONCURRENCY`` - count of parallel transforms processes. Numeric, devault ``cpu-cores * 3``
+* ``IFG_RELATIVE_PATHS_FROM`` - relatives paths start directory. Numeric, default ``process work dir``.
+
+YAML file
+---------
+
+Project-specific configuration.
+
+YAML file like this:
+
+```yaml
+containers:
+  wikimedia:
+    # https://upload.wikimedia.org/wikipedia/commons/4/41/Inter-Con_Kabul.jpg
+    origin:
+      remote: https://upload.wikimedia.org/wikipedia/commons
+      local: DATA/wikimedia/origin
+    transforms:
+      dummy:
+        transform: 'cp "{source}" "{destination}"'
+        local: DATA/wikimedia/transforms/dummy
+```
+
 See also
 ========
 
