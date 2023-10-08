@@ -29,7 +29,7 @@ Environment variables
 Deployment-specific configuration (ENV vars):
 
 * ``IF_TRANSFORMS_CONCURRENCY`` - count of parallel transforms processes. Numeric, devault ``cpu-cores * 3``
-* ``IF_RELATIVE_PATHS_FROM`` - relatives paths start directory. Numeric, default ``process work dir``.
+* ``IF_RELATIVE_PATHS_FROM`` - relatives paths start directory. Default ``process work dir``.
 * ``IF_CONFIG_FILE`` - path to config YAML file.
 
 YAML file
