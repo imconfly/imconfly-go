@@ -26,10 +26,10 @@ Configuration
 Environment variables
 ---------------------
 
-Deoyment-specific configuration.
+Deployment-specific configuration (ENV vars):
 
-* ``IFG_TRANSFORMS_CONCURRENCY`` - count of parallel transforms processes. Numeric, devault ``cpu-cores * 3``
-* ``IFG_RELATIVE_PATHS_FROM`` - relatives paths start directory. Numeric, default ``process work dir``.
+* ``IF_TRANSFORMS_CONCURRENCY`` - count of parallel transforms processes. Numeric, devault ``cpu-cores * 3``
+* ``IF_RELATIVE_PATHS_FROM`` - relatives paths start directory. Numeric, default ``process work dir``.
 
 YAML file
 ---------
