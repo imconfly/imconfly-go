@@ -1,11 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
-
-	"github.com/imconfly/imconfly_go/version"
 
 	"github.com/urfave/cli/v2"
 )
@@ -35,30 +32,15 @@ func main() {
 				Usage:  "print config in JSON format",
 				Action: configAction,
 			},
+			{
+				Name:   "tr-conf",
+				Usage:  "print transforms config in JSON format",
+				Action: trConfAction,
+			},
 		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func runAction(ctx *cli.Context) error {
-	fmt.Println("starts HTTP server here")
-	return nil
-}
-
-func transformAction(ctx *cli.Context) error {
-	fmt.Println("transform action here")
-	return nil
-}
-
-func versionAction(ctx *cli.Context) error {
-	fmt.Println(version.VERSION)
-	return nil
-}
-
-func configAction(ctx *cli.Context) error {
-	fmt.Println("yama conf")
-	return nil
 }
