@@ -11,6 +11,7 @@ type Conf struct {
 	TransformConcurrency int
 	RelativePathsFrom    string
 	ConfigFile           string
+	DataDir              string
 	Host                 string
 	Port                 int
 }
@@ -31,6 +32,7 @@ func GetConf(conf *Conf) error {
 		}
 	}
 	conf.ConfigFile = path.Join(conf.RelativePathsFrom, configFileName)
+	conf.DataDir = path.Join(conf.RelativePathsFrom, "DATA")
 	conf.Host = "localhost"
 	conf.Port = 80
 
