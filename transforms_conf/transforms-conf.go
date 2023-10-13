@@ -1,12 +1,10 @@
 package transforms_conf
 
 import (
-	"errors"
 	"fmt"
 	"github.com/imconfly/imconfly_go/transform"
 	"gopkg.in/yaml.v2"
 	"os"
-	"strings"
 )
 
 type Container struct {
@@ -21,18 +19,7 @@ type Conf struct {
 	Containers map[string]Container
 }
 
-func (c *Conf) GetTransformTask(httpGet string) (*transform.Task, error) {
-	var tReq *transform.TaskRequest
-	{
-		parts := strings.Split(httpGet, "/")
-		if len(parts) < 4 {
-			return nil, errors.New("bad request: no `/container/transform/path` pattern")
-		}
-		tReq.Container = parts[1]
-		tReq.Transform = parts[2]
-		tReq.Path = parts[3]
-	}
-
+func (c *Conf) GetTransformTask(tReq *transform.TaskRequest) (*transform.Task, error) {
 	var origin transform.Origin
 	var container Container
 	{

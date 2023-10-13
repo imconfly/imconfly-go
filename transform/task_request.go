@@ -1,6 +1,10 @@
 package transform
 
-import "path"
+import (
+	"errors"
+	"path"
+	"strings"
+)
 
 const OriginName = "origin"
 
@@ -10,10 +14,23 @@ type TaskRequest struct {
 	Transform string
 	// Path from HTTP request with only "/" slashes
 	Path string
+	// RELATIVE path to local file
+	LocalPath string
 }
 
-// GetLocalPath - returns RELATIVE path to local file
-func (t *TaskRequest) GetLocalPath() string {
-	// @todo: Windows not supported
-	return path.Join(t.Container, t.Transform, t.Path)
+func (tr *TaskRequest) NewTaskRequest(httpGet string) (*TaskRequest, error) {
+	var res *TaskRequest
+	parts := strings.Split(httpGet, "/")
+	if len(parts) < 4 {
+		return nil, errors.New("bad request: no `/container/transform/path` pattern")
+	}
+	res.Container = parts[1]
+	res.Transform = parts[2]
+	res.Path = parts[3]
+	res.LocalPath = path.Join(
+		res.Container,
+		res.Transform,
+		res.Path,
+	)
+	return res, nil
 }
