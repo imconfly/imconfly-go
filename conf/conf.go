@@ -5,7 +5,12 @@ import (
 	"path"
 )
 
-const configFileName = "imconfly.yaml"
+const envPrefix = "IF_"
+
+const defaultConfigFileName = "imconfly.yaml"
+const defaultDataDir = "DATA"
+const defaultHost = "localhost"
+const defaultPort = 80
 
 type Conf struct {
 	TransformConcurrency int
@@ -22,7 +27,7 @@ func GetConf(conf *Conf) error {
 		conf.TransformConcurrency = 24
 	}
 	{
-		conf.RelativePathsFrom = os.Getenv("IF_RELATIVE_PATHS_FROM")
+		conf.RelativePathsFrom = os.Getenv(envPrefix + "RELATIVE_PATHS_FROM")
 		if conf.RelativePathsFrom == "" {
 			var err error
 			conf.RelativePathsFrom, err = os.Getwd()
@@ -31,10 +36,10 @@ func GetConf(conf *Conf) error {
 			}
 		}
 	}
-	conf.ConfigFile = path.Join(conf.RelativePathsFrom, configFileName)
-	conf.DataDir = path.Join(conf.RelativePathsFrom, "DATA")
-	conf.Host = "localhost"
-	conf.Port = 80
+	conf.ConfigFile = path.Join(conf.RelativePathsFrom, defaultConfigFileName)
+	conf.DataDir = path.Join(conf.RelativePathsFrom, defaultDataDir)
+	conf.Host = defaultHost
+	conf.Port = defaultPort
 
 	return nil
 }
