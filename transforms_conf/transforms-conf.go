@@ -1,26 +1,62 @@
 package transforms_conf
 
 import (
-	"os"
-
+	"errors"
+	"fmt"
+	"github.com/imconfly/imconfly_go/transform"
 	"gopkg.in/yaml.v2"
+	"os"
+	"strings"
 )
 
+type Container struct {
+	Origin     transform.Origin
+	Transforms map[string]transform.Transform
+}
+
+// Conf - containers, origins and transforms configuration
+// All requests have `container/transform/path` type
+// if `transform` == "origin" - exactly origin requested
 type Conf struct {
-	Containers map[string]struct {
-		Origin     Origin
-		Transforms map[string]Transform
+	Containers map[string]Container
+}
+
+func (c *Conf) GetTransformTask(httpGet string) (*transform.Task, error) {
+	var tReq *transform.TaskRequest
+	{
+		parts := strings.Split(httpGet, "/")
+		if len(parts) < 4 {
+			return nil, errors.New("bad request: no `/container/transform/path` pattern")
+		}
+		tReq.Container = parts[1]
+		tReq.Transform = parts[2]
+		tReq.Path = parts[3]
 	}
-}
 
-type Origin struct {
-	Remote string
-	Local  string
-}
+	var origin transform.Origin
+	var container Container
+	{
+		container, found := c.Containers[tReq.Container]
+		if !found {
+			return nil, fmt.Errorf("bad request: container `%s` not exist", tReq.Container)
+		}
+		origin = container.Origin
+	}
 
-type Transform struct {
-	Transform string
-	Local     string
+	var tr *transform.Transform
+	{
+		if tReq.Transform == transform.OriginName {
+			tr = nil
+		} else {
+			t, found := container.Transforms[tReq.Transform]
+			if !found {
+				return nil, fmt.Errorf("bad request: transform name `%s` not exist", tReq.Transform)
+			}
+			tr = &t
+		}
+	}
+
+	return transform.NewTask(tReq, &origin, tr), nil
 }
 
 func GetConf(conf *Conf, confFilePath string) error {
@@ -31,5 +67,6 @@ func GetConf(conf *Conf, confFilePath string) error {
 	if err := yaml.Unmarshal(b, conf); err != nil {
 		return err
 	}
+	// @todo: check what no "origin" transforms names
 	return nil
 }
