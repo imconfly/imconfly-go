@@ -11,6 +11,7 @@ const defaultConfigFileName = "imconfly.yaml"
 const defaultDataDir = "DATA"
 const defaultHost = "localhost"
 const defaultPort = 80
+const defaultTmpDir = "/tmp/imconfly" // @todo: Windows
 
 type Conf struct {
 	TransformConcurrency int
@@ -19,6 +20,7 @@ type Conf struct {
 	DataDir              string
 	Host                 string
 	Port                 int
+	TmpDir               string
 }
 
 func GetConf(conf *Conf) error {
@@ -40,6 +42,7 @@ func GetConf(conf *Conf) error {
 	conf.DataDir = path.Join(conf.RelativePathsFrom, defaultDataDir)
 	conf.Host = defaultHost
 	conf.Port = defaultPort
+	conf.TmpDir = defaultTmpDir
 
 	return nil
 }

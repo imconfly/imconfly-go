@@ -2,48 +2,46 @@ package transforms_conf
 
 import (
 	"fmt"
-	"github.com/imconfly/imconfly_go/transform"
+	"github.com/imconfly/imconfly_go/task"
 	"gopkg.in/yaml.v2"
 	"os"
 )
 
 type Container struct {
-	Origin     transform.Origin
+	Origin     task.Origin
 	Transforms map[string]string
 }
 
 // Conf - containers, origins and transforms configuration
-// All requests have `container/transform/path` type
-// if `transform` == "origin" - exactly origin requested
+// All requests have `container/ext_worker/path` type
+// if `ext_worker` == "origin" - exactly origin requested
 type Conf struct {
 	Containers map[string]Container
 }
 
-func (c *Conf) GetTransformTask(tReq *transform.TaskRequest) (*transform.Task, error) {
-	var origin transform.Origin
+func (c *Conf) NewTask(tReq *task.Request, out *task.Task) error {
 	var container Container
 	{
 		container, found := c.Containers[tReq.Container]
 		if !found {
-			return nil, fmt.Errorf("bad request: container `%s` not exist", tReq.Container)
+			return fmt.Errorf("bad request: container `%s` not exist", tReq.Container)
 		}
-		origin = container.Origin
+		out.Origin = &container.Origin
 	}
 
-	var tr *string
 	{
-		if tReq.Transform == transform.OriginName {
-			tr = nil
+		if tReq.Transform == task.OriginName {
+			out.Transform = nil
 		} else {
 			t, found := container.Transforms[tReq.Transform]
 			if !found {
-				return nil, fmt.Errorf("bad request: transform name `%s` not exist", tReq.Transform)
+				return fmt.Errorf("bad request: ext_worker name `%s` not exist", tReq.Transform)
 			}
-			tr = &t
+			*out.Transform = task.Transform(t)
 		}
 	}
 
-	return transform.NewTask(tReq, &origin, tr), nil
+	return nil
 }
 
 func GetConf(conf *Conf, confFilePath string) error {

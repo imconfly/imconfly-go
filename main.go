@@ -18,7 +18,7 @@ func main() {
 				Action: runAction,
 			},
 			{
-				Name:   "transform",
+				Name:   "ext_worker",
 				Usage:  "works like HTTP query but print target filename",
 				Action: transformAction,
 			},

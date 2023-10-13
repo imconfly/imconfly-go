@@ -17,7 +17,7 @@ func runAction(ctx *cli.Context) error {
 }
 
 func transformAction(ctx *cli.Context) error {
-	fmt.Println("transform action here")
+	fmt.Println("ext_worker action here")
 	return nil
 }
 
