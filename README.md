@@ -44,12 +44,10 @@ containers:
   wikimedia:
     # https://upload.wikimedia.org/wikipedia/commons/4/41/Inter-Con_Kabul.jpg
     origin:
-      remote: https://upload.wikimedia.org/wikipedia/commons
-      local: DATA/wikimedia/origin
+      source: https://upload.wikimedia.org/wikipedia/commons
+      access: true
     transforms:
-      dummy:
-        transform: 'cp "{source}" "{destination}"'
-        local: DATA/wikimedia/transforms/dummy
+      dummy: 'cp "{source}" "{target}"'
 ```
 
 See also

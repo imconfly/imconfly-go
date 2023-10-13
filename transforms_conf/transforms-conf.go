@@ -9,7 +9,7 @@ import (
 
 type Container struct {
 	Origin     transform.Origin
-	Transforms map[string]transform.Transform
+	Transforms map[string]string
 }
 
 // Conf - containers, origins and transforms configuration
@@ -30,7 +30,7 @@ func (c *Conf) GetTransformTask(tReq *transform.TaskRequest) (*transform.Task, e
 		origin = container.Origin
 	}
 
-	var tr *transform.Transform
+	var tr *string
 	{
 		if tReq.Transform == transform.OriginName {
 			tr = nil
