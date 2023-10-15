@@ -9,7 +9,7 @@ import (
 
 type Container struct {
 	Origin     task.Origin
-	Transforms map[string]string
+	Transforms map[string]task.Transform
 }
 
 // Conf - containers, origins and transforms configuration
@@ -37,7 +37,7 @@ func (c *Conf) NewTask(tReq *task.Request, out *task.Task) error {
 			if !found {
 				return fmt.Errorf("bad request: ext_worker name `%s` not exist", tReq.Transform)
 			}
-			*out.Transform = task.Transform(t)
+			*out.Transform = t
 		}
 	}
 

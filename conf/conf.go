@@ -1,48 +1,41 @@
 package conf
 
 import (
+	"github.com/imconfly/imconfly_go/lib/env_conf"
 	"os"
 	"path"
 )
 
-const envPrefix = "IF_"
-
-const defaultConfigFileName = "imconfly.yaml"
-const defaultDataDir = "DATA"
-const defaultHost = "localhost"
-const defaultPort = 80
-const defaultTmpDir = "/tmp/imconfly" // @todo: Windows
+const (
+	envPrefix             = "IF_"
+	defaultConfigFileName = "imconfly.yaml"
+	defaultDataDir        = "DATA"
+	defaultHost           = "localhost"
+	defaultPort           = 80
+	defaultTmpDir         = "/tmp/imconfly" // @todo: Windows
+)
 
 type Conf struct {
 	TransformConcurrency int
 	RelativePathsFrom    string
 	ConfigFile           string
 	DataDir              string
+	TmpDir               string
 	Host                 string
 	Port                 int
-	TmpDir               string
 }
 
-func GetConf(conf *Conf) error {
-	{
-		// @todo
-		conf.TransformConcurrency = 24
-	}
-	{
-		conf.RelativePathsFrom = os.Getenv(envPrefix + "RELATIVE_PATHS_FROM")
-		if conf.RelativePathsFrom == "" {
-			var err error
-			conf.RelativePathsFrom, err = os.Getwd()
-			if err != nil {
-				return err
-			}
-		}
-	}
-	conf.ConfigFile = path.Join(conf.RelativePathsFrom, defaultConfigFileName)
-	conf.DataDir = path.Join(conf.RelativePathsFrom, defaultDataDir)
-	conf.Host = defaultHost
-	conf.Port = defaultPort
-	conf.TmpDir = defaultTmpDir
+func GetConf() *Conf {
+	e := env_conf.New(envPrefix)
 
-	return nil
+	rp := e.Str("RELATIVE_PATHS_FROM", env_conf.Must(os.Getwd()))
+	return &Conf{
+		TransformConcurrency: e.Int("TRANSFORM_CONCURRENCY", 24), // @todo: default
+		RelativePathsFrom:    rp,
+		ConfigFile:           e.Str("CONFIG_FILE", path.Join(rp, defaultConfigFileName)),
+		DataDir:              e.Str("DATA_DIR", path.Join(rp, defaultDataDir)),
+		TmpDir:               e.Str("TMP_DIR", defaultTmpDir),
+		Host:                 e.Str("HOST", defaultHost),
+		Port:                 e.Int("PORT", defaultPort),
+	}
 }

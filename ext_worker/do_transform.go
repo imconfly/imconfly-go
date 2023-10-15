@@ -1,8 +1,8 @@
 package ext_worker
 
 import (
-	"github.com/imconfly/imconfly_go/queue"
 	"github.com/imconfly/imconfly_go/task"
+	"github.com/imconfly/imconfly_go/transform"
 	"github.com/imconfly/imconfly_go/transforms_conf"
 	"os"
 	"path"
@@ -12,9 +12,9 @@ func WaitTransform(
 	req *task.Request,
 	trConf *transforms_conf.Conf,
 	dataDir string,
-	q *queue.Queue,
+	q *transform.Queue,
 ) error {
-	// no wait if file exist
+	// no wait if files exist
 	{
 		localFilePath := path.Join(dataDir, string(req.Key))
 		if _, err := os.Stat(localFilePath); err == nil {
