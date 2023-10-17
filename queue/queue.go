@@ -1,4 +1,4 @@
-package transform
+package queue
 
 import (
 	"fmt"
@@ -6,35 +6,45 @@ import (
 	"sync"
 )
 
+type Task struct {
+	Request   *Request
+	Origin    *Origin
+	Transform *Transform
+}
+
 type taskSubscribers struct {
 	Task        *Task
 	Subscribers []chan error
 }
 
 type Queue struct {
-	mu        sync.Mutex
-	tsMap     map[os_tools.FileRelativePath]*taskSubscribers
-	queueChan chan *Task
+	mu    sync.Mutex
+	tsMap map[os_tools.FileRelativePath]*taskSubscribers
+	queue chan *Task
 }
 
-func (q *Queue) Add(ta *Task, subscriberCh chan error) {
+func (q *Queue) Add(ta *Task) chan error {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
-	if alreadyAdded, found := q.tsMap[ta.File.Key]; found {
-		alreadyAdded.Subscribers = append(alreadyAdded.Subscribers, subscriberCh)
+	ch := make(chan error, 1)
+
+	if alreadyAdded, found := q.tsMap[ta.Request.Key]; found {
+		alreadyAdded.Subscribers = append(alreadyAdded.Subscribers, ch)
 	} else {
 		ts := &taskSubscribers{
 			Task:        ta,
-			Subscribers: []chan error{subscriberCh},
+			Subscribers: []chan error{ch},
 		}
-		q.tsMap[ta.File.Key] = ts
-		q.queueChan <- ta
+		q.tsMap[ta.Request.Key] = ts
+		q.queue <- ta
 	}
+
+	return ch
 }
 
 func (q *Queue) Get() *Task {
-	return <-q.queueChan
+	return <-q.queue
 }
 
 func (q *Queue) Done(key os_tools.FileRelativePath, err error) {
@@ -49,5 +59,5 @@ func (q *Queue) Done(key os_tools.FileRelativePath, err error) {
 		panic(fmt.Sprintf("Task `%s` not found in transform transform map!", key))
 	}
 
-	delete(q.tsMap, key)
+	delete(q.tsMap, key) // @todo: all read?
 }

@@ -11,6 +11,6 @@ type DirAbsPath absPath
 
 type FileRelativePath relativePath
 
-func (fap FileRelativePath) GetAbsPath(prefix DirAbsPath) FileAbsPath {
-	return FileAbsPath(path.Join(string(prefix), string(fap)))
+func (d DirAbsPath) FileAbsPath(suffix FileRelativePath) FileAbsPath {
+	return FileAbsPath(path.Join(string(d), string(suffix)))
 }
