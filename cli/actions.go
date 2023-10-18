@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"encoding/json"
@@ -20,7 +20,7 @@ func transformAction(_ *cli.Context) error {
 }
 
 func versionAction(_ *cli.Context) error {
-	fmt.Println(version.VERSION)
+	fmt.Println(version.Version)
 	return nil
 }
 

@@ -1,6 +1,7 @@
 package internal_workers
 
 import (
+	"fmt"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/lib/tmp_file"
 	"github.com/imconfly/imconfly_go/queue"
@@ -50,6 +51,10 @@ func getOrigin(
 	} else if exist {
 		// origin exist - ok, here is nothing to do
 		return nil
+	}
+
+	if t.Origin.GetType() == queue.OriginTypeFS {
+		return fmt.Errorf("origin not found: `%s`", *outOriginPath)
 	}
 
 	// task for origin of current task

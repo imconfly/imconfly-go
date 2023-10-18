@@ -3,6 +3,7 @@ package transforms_conf
 import (
 	"errors"
 	"fmt"
+	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/queue"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -54,8 +55,8 @@ func (c *Conf) ValidateRequest(r *queue.Request, out *queue.Task) error {
 	return nil
 }
 
-func GetConf(conf *Conf, confFilePath string) error {
-	b, err := os.ReadFile(confFilePath)
+func GetConf(conf *Conf, filePath os_tools.FileAbsPath) error {
+	b, err := os.ReadFile(string(filePath))
 	if err != nil {
 		return err
 	}
