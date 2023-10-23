@@ -23,6 +23,14 @@ type Queue struct {
 	queue chan *Task
 }
 
+func NewQueue() *Queue {
+	return &Queue{
+		mu:    sync.Mutex{},
+		tsMap: make(map[os_tools.FileRelativePath]*taskSubscribers),
+		queue: make(chan *Task),
+	}
+}
+
 func (q *Queue) Add(ta *Task) chan error {
 	q.mu.Lock()
 	defer q.mu.Unlock()
