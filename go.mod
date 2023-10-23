@@ -1,6 +1,6 @@
 module github.com/imconfly/imconfly_go
 
-go 1.21.1
+go 1.19
 
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
