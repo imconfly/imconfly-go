@@ -15,13 +15,13 @@ func Exec(
 	trConf *transforms_conf.Conf,
 	out *string,
 ) error {
-	var r *queue.Request
-	if err := queue.RequestFromString(rStr, r); err != nil {
+	r, err := queue.RequestFromString(rStr)
+	if err != nil {
 		return err
 	}
 
-	var t *queue.Task
-	if err := trConf.ValidateRequest(r, t); err != nil {
+	t, err := trConf.ValidateRequest(r)
+	if err != nil {
 		return err
 	}
 

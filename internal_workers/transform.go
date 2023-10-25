@@ -90,8 +90,8 @@ func doTransform(
 	}
 
 	tmpPath := t.Request.TmpPath(tmpDir)
-	var tmpFile *tmp_file.TmpFile
-	if err := tmp_file.NewTmpFile(tmpPath, tmpFile); err != nil {
+	tmpFile, err := tmp_file.NewTmpFile(tmpPath)
+	if err != nil {
 		return err
 	}
 	defer tmpFile.Clean()

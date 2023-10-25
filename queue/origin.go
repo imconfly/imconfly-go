@@ -2,6 +2,7 @@ package queue
 
 import (
 	"errors"
+	"fmt"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"io"
 	"net/http"
@@ -51,7 +52,8 @@ func (o *Origin) GetHTTPFile(suffix string, tmpPath os_tools.FileAbsPath) error 
 	if o.GetType() != OriginTypeHTTP {
 		return TypeError
 	}
-	url := path.Join(o.Source, suffix)
+	url := o.Source + "/" + suffix
+	fmt.Println("GET URL:", url)
 
 	resp, err := http.Get(url)
 	if err != nil {

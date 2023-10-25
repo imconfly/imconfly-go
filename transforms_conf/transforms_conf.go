@@ -21,7 +21,7 @@ type Conf struct {
 	Containers map[string]Container
 }
 
-func (c *Conf) ValidateRequest(r *queue.Request, out *queue.Task) error {
+func (c *Conf) ValidateRequest(r *queue.Request) (*queue.Task, error) {
 	var container Container
 	var origin *queue.Origin
 	var transform *queue.Transform
@@ -29,7 +29,7 @@ func (c *Conf) ValidateRequest(r *queue.Request, out *queue.Task) error {
 	{
 		container, found := c.Containers[r.Container]
 		if !found {
-			return fmt.Errorf("bad request: container `%s` not exist", r.Container)
+			return nil, fmt.Errorf("bad request: container `%s` not exist", r.Container)
 		}
 		origin = &container.Origin
 	}
@@ -37,32 +37,34 @@ func (c *Conf) ValidateRequest(r *queue.Request, out *queue.Task) error {
 	if r.IsOrigin() {
 		transform = nil
 		if !origin.Access {
-			return errors.New("forbidden")
+			return nil, errors.New("forbidden")
 		}
 	} else {
 		t, found := container.Transforms[r.Transform]
 		if !found {
-			return fmt.Errorf("bad request: transform name `%s` not exist", r.Transform)
+			return nil, fmt.Errorf("bad request: transform name `%s` not exist", r.Transform)
 		}
 		transform = &t
 	}
 
-	out = &queue.Task{
+	task := queue.Task{
 		Request:   r,
 		Origin:    origin,
 		Transform: transform,
 	}
-	return nil
+	return &task, nil
 }
 
-func GetConf(conf *Conf, filePath os_tools.FileAbsPath) error {
+func GetConf(filePath os_tools.FileAbsPath) (*Conf, error) {
 	b, err := os.ReadFile(string(filePath))
 	if err != nil {
-		return err
+		return nil, err
 	}
+
+	conf := new(Conf)
 	if err := yaml.Unmarshal(b, conf); err != nil {
-		return err
+		return nil, err
 	}
 	// @todo: check what no "origin" transforms names
-	return nil
+	return conf, nil
 }

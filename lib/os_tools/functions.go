@@ -23,7 +23,7 @@ func Rename(source, target FileAbsPath) error {
 	if err := MkdirFor(target); err != nil {
 		return err
 	}
-
+	// @todo: invalid cross-device link
 	return os.Rename(string(source), string(target))
 }
 

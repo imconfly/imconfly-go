@@ -2,6 +2,8 @@ package queue
 
 import (
 	"crypto/md5"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	o "github.com/imconfly/imconfly_go/lib/os_tools"
 	"path"
@@ -46,17 +48,27 @@ func newRequest(c, t string, p o.FileRelativePath) *Request {
 	}
 }
 
-func RequestFromString(httpGet string, out *Request) error {
+func RequestFromString(httpGet string) (*Request, error) {
+	if len(httpGet) == 0 {
+		return nil, errors.New("empty string")
+	}
+	if httpGet[0:1] != "/" {
+		return nil, errors.New("request string must start with `/`")
+	}
 	parts := strings.Split(httpGet, "/")
 	if len(parts) < 4 {
-		return fmt.Errorf("bad request: no `/container/transform/path` pattern in `%s`", httpGet)
+		return nil, fmt.Errorf("bad request: no `/container/transform/path` pattern in `%s`", httpGet)
 	}
 
-	out = newRequest(parts[1], parts[2], "todo") // @todo: o.FileRelativePath(path.Join(...parts[3:]))
-	return nil
+	out := newRequest(
+		parts[1],
+		parts[2],
+		o.FileRelativePath(path.Join(parts[3:]...)),
+	)
+	return out, nil
 }
 
 func md5string(b []byte) string {
 	sum := md5.Sum(b)
-	return string(sum[:])
+	return hex.EncodeToString(sum[:])
 }

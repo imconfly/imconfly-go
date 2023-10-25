@@ -20,11 +20,10 @@ func execAction(ctx *cli.Context) error {
 		return cli.Exit("Usage: need one arg", 64)
 	}
 	arg := ctx.Args().First()
-	//fmt.Printf("%s\n", arg)
 
 	c := conf.GetConf()
-	var trC *transforms_conf.Conf
-	if err := transforms_conf.GetConf(trC, c.ConfigFile); err != nil {
+	trC, err := transforms_conf.GetConf(c.ConfigFile)
+	if err != nil {
 		return cli.Exit(err.Error(), 78)
 	}
 
@@ -56,8 +55,8 @@ func configAction(_ *cli.Context) error {
 
 func trConfAction(_ *cli.Context) error {
 	coreConf := conf.GetConf()
-	var c transforms_conf.Conf
-	if err := transforms_conf.GetConf(&c, coreConf.ConfigFile); err != nil {
+	c, err := transforms_conf.GetConf(coreConf.ConfigFile)
+	if err != nil {
 		return err
 	}
 

@@ -20,13 +20,13 @@ func Action(t *queue.Task, dataDir, tmpDir o.DirAbsPath) error {
 	tmpPath := t.Request.TmpPath(tmpDir)
 	targetPath := t.Request.LocalAbsPath(dataDir)
 
-	var tmpFile *tmp_file.TmpFile
-	if err := tmp_file.NewTmpFile(tmpPath, tmpFile); err != nil {
+	tmpFile, err := tmp_file.NewTmpFile(tmpPath)
+	if err != nil {
 		return err
 	}
 	defer tmpFile.Clean()
 
-	if err := t.Origin.GetHTTPFile(string(t.Request.Key), tmpPath); err != nil {
+	if err := t.Origin.GetHTTPFile(string(t.Request.PathLastPart), tmpPath); err != nil {
 		return err
 	}
 

@@ -27,7 +27,7 @@ func NewQueue() *Queue {
 	return &Queue{
 		mu:    sync.Mutex{},
 		tsMap: make(map[os_tools.FileRelativePath]*taskSubscribers),
-		queue: make(chan *Task),
+		queue: make(chan *Task, 10),
 	}
 }
 

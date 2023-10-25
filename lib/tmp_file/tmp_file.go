@@ -10,10 +10,12 @@ type TmpFile struct {
 	moved bool
 }
 
-func NewTmpFile(p os_tools.FileAbsPath, out *TmpFile) error {
-	out.path = p
-	out.moved = false
-	return os_tools.MkdirFor(out.path)
+func NewTmpFile(p os_tools.FileAbsPath) (*TmpFile, error) {
+	out := TmpFile{
+		path:  p,
+		moved: false,
+	}
+	return &out, os_tools.MkdirFor(out.path)
 }
 
 // Clean
