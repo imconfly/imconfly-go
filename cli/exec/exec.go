@@ -43,8 +43,8 @@ func do(t *queue.Task, dDir, tDir o.DirAbsPath) error {
 	}
 
 	oQ := queue.NewQueue()
+	go internal_workers.OriginWorker(oQ, dDir, tDir)
 	ch := oQ.Add(t)
-	internal_workers.OriginWorker(oQ, dDir, tDir)
 
 	return <-ch
 }

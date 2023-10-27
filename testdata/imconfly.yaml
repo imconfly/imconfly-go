@@ -1,0 +1,8 @@
+containers:
+    wikimedia:
+        # https://upload.wikimedia.org/wikipedia/commons/4/41/Inter-Con_Kabul.jpg
+        origin:
+            source: https://upload.wikimedia.org/wikipedia/commons
+            access: true
+        transforms:
+            dummy: 'cp "{source}" "{target}"'
