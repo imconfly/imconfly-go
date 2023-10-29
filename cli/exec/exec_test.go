@@ -9,22 +9,31 @@ import (
 )
 
 const trConfFile = "../../testdata/imconfly.yaml"
-const requestString = "/wikimedia/origin/4/41/Inter-Con_Kabul.jpg"
+const originRequestString = "/wikimedia/origin/4/41/Inter-Con_Kabul.jpg"
+const transformRequestString = "/wikimedia/dummy/4/41/Inter-Con_Kabul.jpg"
 const testDir = "/tmp/imconfly_tests"
 const dataDir = testDir + "/data"
 const tmpDir = testDir + "/tmp"
 
-func TestExec(t *testing.T) {
+func TestExec_origin(t *testing.T) {
+	testExec(t, originRequestString)
+}
+
+func _TestExec_transform(t *testing.T) {
+	testExec(t, transformRequestString)
+}
+
+func testExec(t *testing.T, request string) {
 	trConf := getTrConf(t)
 	t.Logf("TrConf: %+v", trConf)
 	t.Log("Exec(), test params are:")
-	t.Logf("Request (rStr): %s", requestString)
+	t.Logf("Request (rStr): %s", request)
 	t.Logf("Data dir (dDir): %s", dataDir)
 	t.Logf("Tmp dir (tDir): %s", tmpDir)
 	var result string
 	defer os.RemoveAll(testDir)
 	err := Exec(
-		requestString,
+		originRequestString,
 		dataDir,
 		tmpDir,
 		trConf,
