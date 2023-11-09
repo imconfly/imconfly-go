@@ -26,8 +26,16 @@ func Action(t *queue.Task, dataDir, tmpDir o.DirAbsPath) error {
 	}
 	defer tmpFile.Clean()
 
-	if err := t.Origin.GetHTTPFile(string(t.Request.PathLastPart), tmpPath); err != nil {
-		return err
+	if t.Origin.Transport == "" {
+		// Internal HTTP transport
+		if err := t.Origin.GetHTTPFile(string(t.Request.PathLastPart), tmpPath); err != nil {
+			return err
+		}
+	} else {
+		// User custom transport
+		if err := t.Origin.ExecTransport(string(t.Request.PathLastPart), tmpPath); err != nil {
+			return err
+		}
 	}
 
 	return tmpFile.Move(targetPath)

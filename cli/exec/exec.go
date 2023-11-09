@@ -20,7 +20,7 @@ func Exec(
 		return err
 	}
 
-	t, err := trConf.ValidateRequest(r)
+	task, err := trConf.ValidateRequest(r)
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func Exec(
 		return nil
 	}
 
-	return do(t, dDir, tDir)
+	return do(task, dDir, tDir)
 }
 
 func do(t *queue.Task, dDir, tDir o.DirAbsPath) error {

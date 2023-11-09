@@ -3,6 +3,7 @@ package queue
 import (
 	"errors"
 	"fmt"
+	"github.com/imconfly/imconfly_go/lib/exec"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"io"
 	"net/http"
@@ -14,24 +15,25 @@ import (
 const (
 	OriginName        = "origin"
 	OriginTypeHTTP    = "HTTP"
-	OriginTypeFS      = "Local filesystem"
+	OriginTypeFS      = "LOCAL_FS"
 	OriginTypeUnknown = "_error_"
 )
 
 var TypeError = errors.New("wrong origin type")
 
 type Origin struct {
-	Source string
-	Access bool
+	Source    string
+	Transport string
+	Access    bool
 }
 
 func (o *Origin) GetType() string {
 	l := strings.ToLower(o.Source)
-	http := strings.HasPrefix(l, "http://")
+	httpT := strings.HasPrefix(l, "http://")
 	https := strings.HasPrefix(l, "https://")
 	file := strings.HasPrefix(l, "/") // @todo: Windows
 
-	if http || https {
+	if httpT || https {
 		return OriginTypeHTTP
 	} else if file {
 		return OriginTypeFS
@@ -40,7 +42,7 @@ func (o *Origin) GetType() string {
 	}
 }
 
-func (o *Origin) GetPath(suffix os_tools.FileRelativePath, out *os_tools.FileAbsPath) error {
+func (o *Origin) GetTypeFsPath(suffix os_tools.FileRelativePath, out *os_tools.FileAbsPath) error {
 	if o.GetType() != OriginTypeFS {
 		return TypeError
 	}
@@ -70,4 +72,14 @@ func (o *Origin) GetHTTPFile(suffix string, tmpPath os_tools.FileAbsPath) error 
 	_, err = io.Copy(f, resp.Body)
 
 	return err
+}
+
+func (o *Origin) ExecTransport(suffix string, tmpPath os_tools.FileAbsPath) error {
+	sourceURLorPath := o.Source + "/" + suffix
+
+	if err := os_tools.MkdirFor(tmpPath); err != nil {
+		return err
+	}
+
+	return exec.Exec(o.Transport, sourceURLorPath, string(tmpPath))
 }

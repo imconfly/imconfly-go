@@ -18,7 +18,7 @@ type Container struct {
 // All requests have `container/ext_worker/path` type
 // if `ext_worker` == "origin" - exactly origin requested
 type Conf struct {
-	Containers map[string]Container
+	Containers map[string]*Container
 }
 
 func (c *Conf) ValidateRequest(r *queue.Request) (*queue.Task, error) {

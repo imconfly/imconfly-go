@@ -1,6 +1,7 @@
 package exec
 
 import (
+	"encoding/json"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/transforms_conf"
 	"os"
@@ -9,29 +10,48 @@ import (
 )
 
 const trConfFile = "../../testdata/imconfly.yaml"
+
+// https://upload.wikimedia.org/wikipedia/commons/4/41/Inter-Con_Kabul.jpg
 const originRequestString = "/wikimedia/origin/4/41/Inter-Con_Kabul.jpg"
 const transformRequestString = "/wikimedia/dummy/4/41/Inter-Con_Kabul.jpg"
 const testDir = "/tmp/imconfly_tests"
 const dataDir = testDir + "/data"
 const tmpDir = testDir + "/tmp"
 
-func TestExec_origin(t *testing.T) {
-	testExec(t, originRequestString)
+func TestExec_originDefaultHTTPTransport(t *testing.T) {
+	trConf := getTrConf(t)
+	trConf.Containers["wikimedia"].Origin.Transport = ""
+	testExec(t, trConf, originRequestString)
+}
+
+func TestExec_originCustomTransport(t *testing.T) {
+	trConf := getTrConf(t)
+	testExec(t, trConf, originRequestString)
 }
 
 func _TestExec_transform(t *testing.T) {
-	testExec(t, transformRequestString)
+	trConf := getTrConf(t)
+	testExec(t, trConf, transformRequestString)
 }
 
-func testExec(t *testing.T, request string) {
-	trConf := getTrConf(t)
-	t.Logf("TrConf: %+v", trConf)
+func clean(t *testing.T) error {
+	t.Logf("Clean: rm dir %s", testDir)
+	return os.RemoveAll(testDir)
+}
+
+func jsonMarshal(v any) string {
+	b, _ := json.MarshalIndent(v, "  ", "  ")
+	return string(b)
+}
+
+func testExec(t *testing.T, trConf *transforms_conf.Conf, request string) {
+	defer clean(t)
+	t.Logf("TrConf: %+v, %s", trConf, jsonMarshal(trConf))
 	t.Log("Exec(), test params are:")
 	t.Logf("Request (rStr): %s", request)
 	t.Logf("Data dir (dDir): %s", dataDir)
 	t.Logf("Tmp dir (tDir): %s", tmpDir)
 	var result string
-	defer os.RemoveAll(testDir)
 	err := Exec(
 		originRequestString,
 		dataDir,
