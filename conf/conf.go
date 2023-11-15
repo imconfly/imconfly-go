@@ -5,6 +5,7 @@ import (
 	o "github.com/imconfly/imconfly_go/lib/os_tools"
 	"os"
 	"path"
+	"runtime"
 )
 
 const (
@@ -30,8 +31,9 @@ func GetConf() *Conf {
 	e := env_conf.New(envPrefix)
 
 	rp := e.Str("RELATIVE_PATHS_FROM", env_conf.Must(os.Getwd()))
+
 	return &Conf{
-		TransformConcurrency: e.Int("TRANSFORM_CONCURRENCY", 24), // @todo: default
+		TransformConcurrency: e.Int("TRANSFORM_CONCURRENCY", runtime.NumCPU()),
 		RelativePathsFrom:    o.DirAbsPath(rp),
 		ConfigFile:           o.FileAbsPath(e.Str("CONFIG_FILE", path.Join(rp, defaultConfigFileName))),
 		DataDir:              o.DirAbsPath(e.Str("DATA_DIR", path.Join(rp, defaultDataDir))),
