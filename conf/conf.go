@@ -12,8 +12,7 @@ const (
 	envPrefix             = "IF_"
 	defaultConfigFileName = "imconfly.yaml"
 	defaultDataDir        = "DATA"
-	defaultHost           = "localhost"
-	defaultPort           = 80
+	defaultServerAddr     = "localhost:8081"
 	defaultTmpDir         = "/tmp/imconfly" // @todo: Windows
 )
 
@@ -23,8 +22,7 @@ type Conf struct {
 	ConfigFile           o.FileAbsPath
 	DataDir              o.DirAbsPath
 	TmpDir               o.DirAbsPath
-	Host                 string
-	Port                 int
+	ServerAddr           string
 }
 
 func GetConf() *Conf {
@@ -38,7 +36,6 @@ func GetConf() *Conf {
 		ConfigFile:           o.FileAbsPath(e.Str("CONFIG_FILE", path.Join(rp, defaultConfigFileName))),
 		DataDir:              o.DirAbsPath(e.Str("DATA_DIR", path.Join(rp, defaultDataDir))),
 		TmpDir:               o.DirAbsPath(e.Str("TMP_DIR", defaultTmpDir)),
-		Host:                 e.Str("HOST", defaultHost),
-		Port:                 e.Int("PORT", defaultPort),
+		ServerAddr:           e.Str("SERVER_ADDR", defaultServerAddr),
 	}
 }
