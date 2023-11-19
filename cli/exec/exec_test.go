@@ -2,6 +2,7 @@ package exec
 
 import (
 	"encoding/json"
+	"github.com/imconfly/imconfly_go/testdata"
 	"github.com/imconfly/imconfly_go/transforms_conf"
 	"os"
 	"path/filepath"
@@ -13,9 +14,10 @@ const trConfFile = "../../testdata/imconfly.yaml"
 // https://upload.wikimedia.org/wikipedia/commons/4/41/Inter-Con_Kabul.jpg
 const originRequestString = "/wikimedia/origin/4/41/Inter-Con_Kabul.jpg"
 const transformRequestString = "/wikimedia/dummy/4/41/Inter-Con_Kabul.jpg"
-const testDir = "/tmp/imconfly_tests"
-const dataDir = testDir + "/data"
-const tmpDir = testDir + "/tmp"
+
+const testDir = testdata.TestDir
+const dataDir = testdata.TestDataDir
+const tmpDir = testdata.TestTmpDir
 
 func TestExec_originDefaultHTTPTransport(t *testing.T) {
 	trConf := getTrConf(t)

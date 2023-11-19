@@ -72,7 +72,6 @@ func (o *Origin) GetHTTPFile(suffix string, tmpPath os_tools.FileAbsPath) error 
 	defer f.Close()
 
 	_, err = io.Copy(f, resp.Body)
-
 	return err
 }
 
