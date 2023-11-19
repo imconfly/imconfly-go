@@ -6,6 +6,7 @@ import (
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/queue"
 	"gopkg.in/yaml.v2"
+	"io"
 	"os"
 )
 
@@ -55,8 +56,23 @@ func (c *Conf) ValidateRequest(r *queue.Request) (*queue.Task, error) {
 	return &task, nil
 }
 
-func GetConf(filePath os_tools.FileAbsPath) (*Conf, error) {
-	b, err := os.ReadFile(string(filePath))
+// MustGetConf is shortcut for GetConf, uses for tests only
+func MustGetConf(confFile os_tools.FileAbsPath) *Conf {
+	f, err := os.Open(string(confFile))
+	if err != nil {
+		panic(err.Error())
+	}
+	defer f.Close()
+
+	conf, err := GetConf(f)
+	if err != nil {
+		panic(err.Error())
+	}
+	return conf
+}
+
+func GetConf(reader io.Reader) (*Conf, error) {
+	b, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +81,20 @@ func GetConf(filePath os_tools.FileAbsPath) (*Conf, error) {
 	if err := yaml.Unmarshal(b, conf); err != nil {
 		return nil, err
 	}
-	// @todo: check what no "origin" transforms names
+
+	// check what no "origin" transforms names
+	for containerName, container := range conf.Containers {
+		for transformName, _ := range container.Transforms {
+			if transformName == queue.OriginName {
+				return nil, fmt.Errorf(
+					"transform name cat`t be %q (in %q container)",
+					queue.OriginName,
+					containerName,
+				)
+			}
+		}
+
+	}
+
 	return conf, nil
 }

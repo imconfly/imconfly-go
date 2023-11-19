@@ -2,7 +2,6 @@ package exec
 
 import (
 	"encoding/json"
-	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/transforms_conf"
 	"os"
 	"path/filepath"
@@ -66,12 +65,19 @@ func testExec(t *testing.T, trConf *transforms_conf.Conf, request string) {
 }
 
 func getTrConf(t *testing.T) *transforms_conf.Conf {
-	trConfPath, err := filepath.Abs(trConfFile)
+	trConfAbsPath, err := filepath.Abs(trConfFile)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("Get transforms conf from %s...", trConfPath)
-	c, err := transforms_conf.GetConf(os_tools.FileAbsPath(trConfPath))
+	t.Logf("Get transforms conf from %s...", trConfAbsPath)
+
+	f, err := os.Open(trConfAbsPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	c, err := transforms_conf.GetConf(f)
 	if err != nil {
 		t.Fatal(err)
 	}

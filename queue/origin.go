@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/imconfly/imconfly_go/lib/exec"
@@ -8,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	oexec "os/exec"
 	"path"
 	"strings"
 )
@@ -81,5 +83,17 @@ func (o *Origin) ExecTransport(suffix string, tmpPath os_tools.FileAbsPath) erro
 		return err
 	}
 
-	return exec.Exec(o.Transport, sourceURLorPath, string(tmpPath))
+	cmdName, cmdArgs, err := exec.WithSourceTarget(o.Transport, sourceURLorPath, string(tmpPath))
+	if err != nil {
+		return err
+	}
+
+	cmd := oexec.Command(cmdName, cmdArgs...)
+	var outB, errB bytes.Buffer
+	cmd.Stdout = &outB
+	cmd.Stderr = &errB
+	err = cmd.Run()
+	fmt.Println(outB.String())
+	_, _ = fmt.Fprintln(os.Stderr, errB.String())
+	return err
 }

@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/imconfly/imconfly_go/cli/exec"
 	"github.com/imconfly/imconfly_go/conf"
+	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/transforms_conf"
 	"github.com/imconfly/imconfly_go/version"
 	"github.com/urfave/cli/v2"
+	"os"
 )
 
 func runAction(_ *cli.Context) error {
@@ -21,14 +23,14 @@ func execAction(ctx *cli.Context) error {
 	}
 	arg := ctx.Args().First()
 
-	c := conf.GetConf()
-	trC, err := transforms_conf.GetConf(c.ConfigFile)
+	coreConf := conf.GetConf()
+	trConf, err := _getTrConf(coreConf.ConfigFile)
 	if err != nil {
 		return cli.Exit(err.Error(), 78)
 	}
 
 	var target string
-	if err := exec.Exec(arg, c.DataDir, c.TmpDir, trC, &target); err != nil {
+	if err := exec.Exec(arg, coreConf.DataDir, coreConf.TmpDir, trConf, &target); err != nil {
 		return err
 	}
 
@@ -44,7 +46,23 @@ func versionAction(_ *cli.Context) error {
 func configAction(_ *cli.Context) error {
 	c := conf.GetConf()
 
-	j, err := json.MarshalIndent(c, "", "  ")
+	b, err := json.MarshalIndent(c, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(b))
+	return nil
+}
+
+func trConfAction(_ *cli.Context) error {
+	coreConf := conf.GetConf()
+	transformsConf, err := _getTrConf(coreConf.ConfigFile)
+	if err != nil {
+		return err
+	}
+
+	j, err := json.MarshalIndent(transformsConf, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -53,18 +71,16 @@ func configAction(_ *cli.Context) error {
 	return nil
 }
 
-func trConfAction(_ *cli.Context) error {
-	coreConf := conf.GetConf()
-	c, err := transforms_conf.GetConf(coreConf.ConfigFile)
+func _getTrConf(path os_tools.FileAbsPath) (*transforms_conf.Conf, error) {
+	f, err := os.Open(string(path))
 	if err != nil {
-		return err
+		return nil, cli.Exit(err.Error(), 78)
 	}
+	defer f.Close()
 
-	j, err := json.MarshalIndent(c, "", "  ")
+	trConf, err := transforms_conf.GetConf(f)
 	if err != nil {
-		return err
+		return nil, cli.Exit(err.Error(), 78)
 	}
-
-	fmt.Println(string(j))
-	return nil
+	return trConf, nil
 }
