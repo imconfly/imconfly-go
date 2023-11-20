@@ -1,7 +1,6 @@
 package tmp_file
 
 import (
-	"fmt"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 )
 
@@ -20,13 +19,11 @@ func NewTmpFile(p os_tools.FileAbsPath) (*TmpFile, error) {
 
 // Clean
 // use defer t.Clean()
-func (t *TmpFile) Clean() {
+func (t *TmpFile) Clean() error {
 	if t.moved {
-		return
+		return nil
 	}
-	if err := os_tools.Remove(t.path); err != nil {
-		panic(fmt.Sprintf("Can`t remove tmp file `%s`: %s", t.path, err))
-	}
+	return os_tools.Remove(t.path)
 }
 
 func (t *TmpFile) Move(path os_tools.FileAbsPath) error {
