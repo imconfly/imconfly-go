@@ -13,18 +13,18 @@ func OriginWorker(q *queue.Queue, dataDir, tmpDir o.DirAbsPath) {
 		if task == nil {
 			break
 		}
-		err := Action(task, dataDir, tmpDir)
+		err := DoOneTask(task, dataDir, tmpDir)
 		q.TaskDone(task.Request.Key, err)
 	}
 }
 
-func Action(t *queue.Task, dataDir, tmpDir o.DirAbsPath) error {
-	if !t.Request.IsOrigin() {
-		panic("wat?")
+func DoOneTask(task *queue.Task, dataDir, tmpDir o.DirAbsPath) error {
+	if !task.Request.IsOrigin() {
+		panic("impossible")
 	}
 
-	tmpPath := t.Request.TmpPath(tmpDir)
-	targetPath := t.Request.LocalAbsPath(dataDir)
+	tmpPath := task.Request.TmpPath(tmpDir)
+	targetPath := task.Request.LocalAbsPath(dataDir)
 
 	tmpFile, err := tmp_file.NewTmpFile(tmpPath)
 	if err != nil {
@@ -32,14 +32,14 @@ func Action(t *queue.Task, dataDir, tmpDir o.DirAbsPath) error {
 	}
 	defer tmpFile.Clean()
 
-	if t.Origin.Transport == "" {
+	if task.Origin.Transport == "" {
 		// Internal HTTP transport
-		if err := t.Origin.GetHTTPFile(string(t.Request.PathLastPart), tmpPath); err != nil {
+		if err := task.Origin.GetHTTPFile(string(task.Request.PathLastPart), tmpPath); err != nil {
 			return err
 		}
 	} else {
 		// User custom transport
-		if err := t.Origin.ExecTransport(string(t.Request.PathLastPart), tmpPath); err != nil {
+		if err := task.Origin.ExecTransport(string(task.Request.PathLastPart), tmpPath); err != nil {
 			return err
 		}
 	}

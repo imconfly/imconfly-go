@@ -30,13 +30,11 @@ func doTask(
 	dataDir,
 	tmpDir os_tools.DirAbsPath,
 ) error {
-
 	// check origin exist or get it
 	var originPath os_tools.FileAbsPath
 	if err := getOrigin(task, originQ, dataDir, &originPath); err != nil {
 		return err
 	}
-	fmt.Println("ORI", originPath)
 	// if exactly origin requested - nothing to do
 	if task.Request.IsOrigin() {
 		return nil
@@ -53,7 +51,7 @@ func getOrigin(
 ) error {
 	if t.Request.IsOrigin() {
 		// check file exist
-		*outOriginPath = dataDir.FileAbsPath(t.Request.Key)
+		*outOriginPath = t.Request.LocalAbsPath(dataDir)
 		if exist, err := os_tools.FileExist(*outOriginPath); err != nil {
 			return err
 		} else if exist {
@@ -68,7 +66,7 @@ func getOrigin(
 		return <-originQ.Add(t)
 	} else {
 		originRequest := t.Request.GetOriginRequest()
-		*outOriginPath = dataDir.FileAbsPath(originRequest.Key)
+		*outOriginPath = originRequest.LocalAbsPath(dataDir)
 		if exist, err := os_tools.FileExist(*outOriginPath); err != nil {
 			return err
 		} else if exist {

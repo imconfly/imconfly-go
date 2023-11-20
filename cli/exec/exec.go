@@ -8,13 +8,13 @@ import (
 )
 
 func Exec(
-	rStr string,
-	dDir,
-	tDir o.DirAbsPath,
+	requestString string,
+	dataDir,
+	tmpDir o.DirAbsPath,
 	trConf *transforms_conf.Conf,
 	out *string,
 ) error {
-	r, err := queue.RequestFromString(rStr)
+	r, err := queue.RequestFromString(requestString)
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func Exec(
 		return err
 	}
 
-	target := dDir.FileAbsPath(r.Key)
+	target := dataDir.FileAbsPath(r.Key)
 	*out = string(target)
 	if found, err := o.FileExist(target); err != nil {
 		return err
@@ -32,7 +32,7 @@ func Exec(
 		return nil
 	}
 
-	return doOneTask(task, dDir, tDir)
+	return doOneTask(task, dataDir, tmpDir)
 }
 
 func doOneTask(task *queue.Task, dataDir, tmpDir o.DirAbsPath) error {
