@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/imconfly/imconfly_go/cli/exec"
-	"github.com/imconfly/imconfly_go/conf"
+	"github.com/imconfly/imconfly_go/configuration"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
+	"github.com/imconfly/imconfly_go/server"
 	"github.com/imconfly/imconfly_go/transforms_conf"
 	"github.com/imconfly/imconfly_go/version"
 	"github.com/urfave/cli/v2"
@@ -13,8 +14,13 @@ import (
 )
 
 func runAction(_ *cli.Context) error {
+	conf := configuration.GetConf()
+	trConf, err := _getTrConf(conf.ConfigFile)
+	if err != nil {
+		return err
+	}
 	fmt.Println("starts HTTP server here")
-	return nil
+	return server.RunServer(conf, trConf)
 }
 
 func execAction(ctx *cli.Context) error {
@@ -23,7 +29,7 @@ func execAction(ctx *cli.Context) error {
 	}
 	arg := ctx.Args().First()
 
-	coreConf := conf.GetConf()
+	coreConf := configuration.GetConf()
 	trConf, err := _getTrConf(coreConf.ConfigFile)
 	if err != nil {
 		return cli.Exit(err.Error(), 78)
@@ -44,7 +50,7 @@ func versionAction(_ *cli.Context) error {
 }
 
 func configAction(_ *cli.Context) error {
-	c := conf.GetConf()
+	c := configuration.GetConf()
 
 	b, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
@@ -56,7 +62,7 @@ func configAction(_ *cli.Context) error {
 }
 
 func trConfAction(_ *cli.Context) error {
-	coreConf := conf.GetConf()
+	coreConf := configuration.GetConf()
 	transformsConf, err := _getTrConf(coreConf.ConfigFile)
 	if err != nil {
 		return err

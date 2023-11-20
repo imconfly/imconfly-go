@@ -73,7 +73,7 @@ func getTrConf(t *testing.T) *transforms_conf.Conf {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("Get transforms conf from %s...", trConfAbsPath)
+	t.Logf("Get transforms configuration from %s...", trConfAbsPath)
 
 	f, err := os.Open(trConfAbsPath)
 	if err != nil {

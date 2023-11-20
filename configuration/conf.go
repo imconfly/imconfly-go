@@ -1,4 +1,4 @@
-package conf
+package configuration
 
 import (
 	"github.com/imconfly/imconfly_go/lib/env_conf"
