@@ -17,6 +17,15 @@ type core struct {
 	tmpDir      os_tools.DirAbsPath
 }
 
+func (c *core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fileAbsPath, err := c.Request(r.RequestURI)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.ServeFile(w, r, string(fileAbsPath))
+}
+
 func (c *core) Request(requestStr string) (os_tools.FileAbsPath, error) {
 	request, err := queue.RequestFromString(requestStr)
 	if err != nil {
@@ -57,15 +66,6 @@ func RunServer(conf *configuration.Conf, trConf *transforms_conf.Conf) error {
 		tmpDir:      conf.TmpDir,
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fileAbsPath, err := c.Request(r.RequestURI)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		http.ServeFile(w, r, string(fileAbsPath))
-	})
-
 	fmt.Printf("Server is listening on %s\n", conf.ServerAddr)
-	return http.ListenAndServe(conf.ServerAddr, nil)
+	return http.ListenAndServe(conf.ServerAddr, c)
 }

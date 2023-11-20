@@ -19,7 +19,6 @@ func runAction(_ *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("starts HTTP server here")
 	return server.RunServer(conf, trConf)
 }
 
