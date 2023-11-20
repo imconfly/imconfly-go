@@ -1,11 +1,13 @@
 package server
 
 import (
+	"fmt"
 	"github.com/imconfly/imconfly_go/configuration"
 	"github.com/imconfly/imconfly_go/internal_workers"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/queue"
 	"github.com/imconfly/imconfly_go/transforms_conf"
+	"net/http"
 )
 
 type core struct {
@@ -48,14 +50,22 @@ func RunServer(conf *configuration.Conf, trConf *transforms_conf.Conf) error {
 		go internal_workers.OriginWorker(originQ, conf.DataDir, conf.TmpDir)
 	}
 
-	_ = &core{
+	c := &core{
 		transformsQ: transformsQ,
 		trConf:      trConf,
 		dataDir:     conf.DataDir,
 		tmpDir:      conf.TmpDir,
 	}
-	// fileAbsPath, err := c.Request(str)
-	// ...ServeFile(fileAbsPath)
 
-	return nil
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fileAbsPath, err := c.Request(r.RequestURI)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.ServeFile(w, r, string(fileAbsPath))
+	})
+
+	fmt.Printf("Server is listening on %s\n", conf.ServerAddr)
+	return http.ListenAndServe(conf.ServerAddr, nil)
 }
