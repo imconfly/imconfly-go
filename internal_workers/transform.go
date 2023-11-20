@@ -13,9 +13,15 @@ func TransformWorker(
 	dataDir,
 	tmpDir os_tools.DirAbsPath,
 ) {
-	task := transformsQ.Get()
-	err := doTask(task, originQ, dataDir, tmpDir)
-	transformsQ.Done(task.Request.Key, err)
+	for {
+		task := transformsQ.Get()
+		// queue channel closed
+		if task == nil {
+			break
+		}
+		err := doTask(task, originQ, dataDir, tmpDir)
+		transformsQ.TaskDone(task.Request.Key, err)
+	}
 }
 
 func doTask(
@@ -24,11 +30,13 @@ func doTask(
 	dataDir,
 	tmpDir os_tools.DirAbsPath,
 ) error {
+
 	// check origin exist or get it
 	var originPath os_tools.FileAbsPath
 	if err := getOrigin(task, originQ, dataDir, &originPath); err != nil {
 		return err
 	}
+	fmt.Println("ORI", originPath)
 	// if exactly origin requested - nothing to do
 	if task.Request.IsOrigin() {
 		return nil
@@ -39,40 +47,45 @@ func doTask(
 // check origin exist, if not - get it (wait for ready)
 func getOrigin(
 	t *queue.Task,
-	q *queue.Queue,
+	originQ *queue.Queue,
 	dataDir os_tools.DirAbsPath,
 	outOriginPath *os_tools.FileAbsPath,
 ) error {
-	request := t.Request.GetOriginRequest()
-	*outOriginPath = dataDir.FileAbsPath(t.Request.Key)
-
-	if exist, err := os_tools.FileExist(*outOriginPath); err != nil {
-		return err
-	} else if exist {
-		// origin exist - ok, here is nothing to do
-		return nil
-	}
-
-	if t.Origin.GetType() == queue.OriginTypeFS {
-		return fmt.Errorf("origin not found: `%s`", *outOriginPath)
-	}
-
-	// task for origin of current task
-	var originTask *queue.Task
 	if t.Request.IsOrigin() {
-		// if current task is about origin - just get it
-		originTask = t
+		// check file exist
+		*outOriginPath = dataDir.FileAbsPath(t.Request.Key)
+		if exist, err := os_tools.FileExist(*outOriginPath); err != nil {
+			return err
+		} else if exist {
+			// origin exist - ok, here is nothing to do
+			return nil
+		}
+		// not exist - add current task in origin queue
+		if t.Origin.GetType() == queue.OriginTypeFS {
+			return fmt.Errorf("origin not found: `%s`", *outOriginPath)
+		}
+
+		return <-originQ.Add(t)
 	} else {
-		// if not - create origin task from it
-		originTask = &queue.Task{
-			Request:   request,
+		originRequest := t.Request.GetOriginRequest()
+		*outOriginPath = dataDir.FileAbsPath(originRequest.Key)
+		if exist, err := os_tools.FileExist(*outOriginPath); err != nil {
+			return err
+		} else if exist {
+			// origin exist - ok, here is nothing to do
+			return nil
+		}
+		// not exist - create origin task and add to origin queue
+		if t.Origin.GetType() == queue.OriginTypeFS {
+			return fmt.Errorf("origin not found: `%s`", *outOriginPath)
+		}
+		originTask := &queue.Task{
+			Request:   originRequest,
 			Origin:    t.Origin,
 			Transform: nil,
 		}
+		return <-originQ.Add(originTask)
 	}
-
-	originReadyCh := q.Add(originTask)
-	return <-originReadyCh
 }
 
 func doTransform(

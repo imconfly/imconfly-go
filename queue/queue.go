@@ -31,6 +31,12 @@ func NewQueue() *Queue {
 	}
 }
 
+// Close queue channel
+// From now Get() returns nil and Add() throws panic on new tasks
+func (q *Queue) Close() {
+	close(q.queue)
+}
+
 func (q *Queue) Add(ta *Task) chan error {
 	q.mu.Lock()
 	defer q.mu.Unlock()
@@ -55,7 +61,7 @@ func (q *Queue) Get() *Task {
 	return <-q.queue
 }
 
-func (q *Queue) Done(key os_tools.FileRelativePath, err error) {
+func (q *Queue) TaskDone(key os_tools.FileRelativePath, err error) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 

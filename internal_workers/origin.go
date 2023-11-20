@@ -7,9 +7,15 @@ import (
 )
 
 func OriginWorker(q *queue.Queue, dataDir, tmpDir o.DirAbsPath) {
-	task := q.Get()
-	err := Action(task, dataDir, tmpDir)
-	q.Done(task.Request.Key, err)
+	for {
+		task := q.Get()
+		// queue channel closed
+		if task == nil {
+			break
+		}
+		err := Action(task, dataDir, tmpDir)
+		q.TaskDone(task.Request.Key, err)
+	}
 }
 
 func Action(t *queue.Task, dataDir, tmpDir o.DirAbsPath) error {

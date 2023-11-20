@@ -32,17 +32,17 @@ func Exec(
 		return nil
 	}
 
-	return do(task, dDir, tDir)
+	return doOneTask(task, dDir, tDir)
 }
 
-func do(t *queue.Task, dDir, tDir o.DirAbsPath) error {
+func doOneTask(task *queue.Task, dataDir, tmpDir o.DirAbsPath) error {
 	originQ := queue.NewQueue()
 	transformQ := queue.NewQueue()
+	defer transformQ.Close()
+	defer originQ.Close()
 
-	go internal_workers.OriginWorker(originQ, dDir, tDir)
-	go internal_workers.TransformWorker(transformQ, originQ, dDir, tDir)
+	go internal_workers.OriginWorker(originQ, dataDir, tmpDir)
+	go internal_workers.TransformWorker(transformQ, originQ, dataDir, tmpDir)
 
-	taskErrorChannel := transformQ.Add(t)
-
-	return <-taskErrorChannel
+	return <-transformQ.Add(task)
 }

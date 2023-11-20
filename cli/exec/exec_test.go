@@ -30,7 +30,7 @@ func TestExec_originCustomTransport(t *testing.T) {
 	testExec(t, trConf, originRequestString)
 }
 
-func _TestExec_transform(t *testing.T) {
+func TestExec_transform(t *testing.T) {
 	trConf := getTrConf(t)
 	testExec(t, trConf, transformRequestString)
 }
