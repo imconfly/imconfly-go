@@ -23,12 +23,13 @@ type Conf struct {
 }
 
 func (c *Conf) ValidateRequest(r *queue.Request) (*queue.Task, error) {
-	var container Container
+	var container *Container
 	var origin *queue.Origin
 	var transform *queue.Transform
 
 	{
-		container, found := c.Containers[r.Container]
+		var found bool
+		container, found = c.Containers[r.Container]
 		if !found {
 			return nil, fmt.Errorf("bad request: container `%s` not exist", r.Container)
 		}
@@ -43,7 +44,7 @@ func (c *Conf) ValidateRequest(r *queue.Request) (*queue.Task, error) {
 	} else {
 		t, found := container.Transforms[r.Transform]
 		if !found {
-			return nil, fmt.Errorf("bad request: transform name `%s` not exist", r.Transform)
+			return nil, fmt.Errorf("bad request: transform name %q not exist", r.Transform)
 		}
 		transform = &t
 	}
