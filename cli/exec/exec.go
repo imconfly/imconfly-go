@@ -1,7 +1,6 @@
 package exec
 
 import (
-	"errors"
 	"github.com/imconfly/imconfly_go/internal_workers"
 	o "github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/queue"
@@ -37,14 +36,13 @@ func Exec(
 }
 
 func do(t *queue.Task, dDir, tDir o.DirAbsPath) error {
-	// currently origins only
-	if !t.Request.IsOrigin() {
-		return errors.New("origin pls :))")
-	}
+	originQ := queue.NewQueue()
+	transformQ := queue.NewQueue()
 
-	oQ := queue.NewQueue()
-	go internal_workers.OriginWorker(oQ, dDir, tDir)
-	ch := oQ.Add(t)
+	go internal_workers.OriginWorker(originQ, dDir, tDir)
+	go internal_workers.TransformWorker(transformQ, originQ, dDir, tDir)
 
-	return <-ch
+	taskErrorChannel := transformQ.Add(t)
+
+	return <-taskErrorChannel
 }

@@ -35,9 +35,11 @@ func _TestExec_transform(t *testing.T) {
 	testExec(t, trConf, transformRequestString)
 }
 
-func clean(t *testing.T) error {
+func clean(t *testing.T) {
 	t.Logf("Clean: rm dir %s", testDir)
-	return os.RemoveAll(testDir)
+	if err := os.RemoveAll(testDir); err != nil {
+		t.Error(err)
+	}
 }
 
 func jsonMarshal(v any) string {
@@ -54,7 +56,7 @@ func testExec(t *testing.T, trConf *transforms_conf.Conf, request string) {
 	t.Logf("Tmp dir (tDir): %s", tmpDir)
 	var result string
 	err := Exec(
-		originRequestString,
+		request,
 		dataDir,
 		tmpDir,
 		trConf,
