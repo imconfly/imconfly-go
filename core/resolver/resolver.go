@@ -3,8 +3,8 @@ package resolver
 import (
 	"github.com/imconfly/imconfly_go/core/queue"
 	"github.com/imconfly/imconfly_go/core/request"
+	"github.com/imconfly/imconfly_go/core/transforms_conf"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
-	"github.com/imconfly/imconfly_go/transforms_conf"
 )
 
 type Resolver struct {

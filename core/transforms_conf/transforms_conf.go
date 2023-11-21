@@ -25,7 +25,12 @@ type Conf struct {
 
 // HaveNonLocalOrigins - returns true if originQueue and origin workers needed
 func (c *Conf) HaveNonLocalOrigins() bool {
-	return true // @todo
+	for _, container := range c.Containers {
+		if container.Origin.GetType() != origin.OriginTypeFS {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *Conf) ValidateRequest(r *request.Request) (*queue.Task, error) {

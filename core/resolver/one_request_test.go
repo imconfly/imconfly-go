@@ -2,8 +2,8 @@ package resolver
 
 import (
 	"encoding/json"
+	"github.com/imconfly/imconfly_go/core/transforms_conf"
 	"github.com/imconfly/imconfly_go/testdata"
-	"github.com/imconfly/imconfly_go/transforms_conf"
 	"os"
 	"path/filepath"
 	"testing"

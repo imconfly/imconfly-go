@@ -1,10 +1,10 @@
 package resolver
 
 import (
+	"github.com/imconfly/imconfly_go/core/internal_workers"
 	"github.com/imconfly/imconfly_go/core/queue"
-	"github.com/imconfly/imconfly_go/internal_workers"
+	"github.com/imconfly/imconfly_go/core/transforms_conf"
 	o "github.com/imconfly/imconfly_go/lib/os_tools"
-	"github.com/imconfly/imconfly_go/transforms_conf"
 )
 
 func OneRequest(
