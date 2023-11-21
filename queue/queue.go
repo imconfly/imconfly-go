@@ -70,7 +70,7 @@ func (q *Queue) TaskDone(key os_tools.FileRelativePath, err error) {
 			ch <- err
 		}
 	} else {
-		panic(fmt.Sprintf("Task `%s` not found in transform transform map!", key))
+		panic(fmt.Sprintf("Task %q not found in tasks map!", key))
 	}
 
 	delete(q.tsMap, key) // @todo: all read?
