@@ -12,21 +12,16 @@ type Task struct {
 	Transform *Transform
 }
 
-type taskSubscribers struct {
-	Task        *Task
-	Subscribers []chan error
-}
-
 type Queue struct {
 	mu    sync.Mutex
-	tsMap map[os_tools.FileRelativePath]*taskSubscribers
+	tsMap map[os_tools.FileRelativePath][]chan error
 	queue chan *Task
 }
 
 func NewQueue() *Queue {
 	return &Queue{
 		mu:    sync.Mutex{},
-		tsMap: make(map[os_tools.FileRelativePath]*taskSubscribers),
+		tsMap: make(map[os_tools.FileRelativePath][]chan error),
 		queue: make(chan *Task),
 	}
 }
@@ -37,21 +32,17 @@ func (q *Queue) Close() {
 	close(q.queue)
 }
 
-func (q *Queue) Add(ta *Task) chan error {
+func (q *Queue) Add(task *Task) chan error {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
 	ch := make(chan error, 1)
 
-	if alreadyAdded, found := q.tsMap[ta.Request.Key]; found {
-		alreadyAdded.Subscribers = append(alreadyAdded.Subscribers, ch)
+	if alreadyAdded, found := q.tsMap[task.Request.Key]; found {
+		alreadyAdded = append(alreadyAdded, ch)
 	} else {
-		ts := &taskSubscribers{
-			Task:        ta,
-			Subscribers: []chan error{ch},
-		}
-		q.tsMap[ta.Request.Key] = ts
-		q.queue <- ta
+		q.tsMap[task.Request.Key] = []chan error{ch}
+		q.queue <- task
 	}
 
 	return ch
@@ -66,7 +57,7 @@ func (q *Queue) TaskDone(key os_tools.FileRelativePath, err error) {
 	defer q.mu.Unlock()
 
 	if taskSubscribers, ok := q.tsMap[key]; ok {
-		for _, ch := range taskSubscribers.Subscribers {
+		for _, ch := range taskSubscribers {
 			ch <- err
 		}
 	} else {
