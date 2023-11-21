@@ -2,14 +2,17 @@ package queue
 
 import (
 	"fmt"
+	"github.com/imconfly/imconfly_go/core/origin"
+	"github.com/imconfly/imconfly_go/core/request"
+	"github.com/imconfly/imconfly_go/core/transform"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"sync"
 )
 
 type Task struct {
-	Request   *Request
-	Origin    *Origin
-	Transform *Transform
+	Request   *request.Request
+	Origin    *origin.Origin
+	Transform *transform.Transform
 }
 
 type Queue struct {

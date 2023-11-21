@@ -43,7 +43,7 @@ YAML file like this:
 containers:
   wikimedia:
     # https://upload.wikimedia.org/wikipedia/commons/4/41/Inter-Con_Kabul.jpg
-    origin:
+    orig:
       source: https://upload.wikimedia.org/wikipedia/commons
       access: true
     transforms:

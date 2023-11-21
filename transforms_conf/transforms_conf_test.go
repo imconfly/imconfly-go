@@ -1,7 +1,7 @@
 package transforms_conf
 
 import (
-	"github.com/imconfly/imconfly_go/queue"
+	"github.com/imconfly/imconfly_go/core/request"
 	"github.com/imconfly/imconfly_go/testdata"
 	"strings"
 	"testing"
@@ -27,13 +27,13 @@ func TestConf_ValidateRequest(t *testing.T) {
 	}
 	testdata.LogJSON(t, trConf)
 
-	request, err := queue.RequestFromString(transformRequestString)
+	req, err := request.RequestFromString(transformRequestString)
 	if err != nil {
 		t.Fatal(err)
 	}
-	testdata.LogJSON(t, request)
+	testdata.LogJSON(t, req)
 
-	task, err := trConf.ValidateRequest(request)
+	task, err := trConf.ValidateRequest(req)
 	if err != nil {
 		t.Fatal(err)
 	}

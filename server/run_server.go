@@ -3,8 +3,8 @@ package server
 import (
 	"fmt"
 	"github.com/imconfly/imconfly_go/configuration"
+	"github.com/imconfly/imconfly_go/core/queue"
 	"github.com/imconfly/imconfly_go/internal_workers"
-	"github.com/imconfly/imconfly_go/queue"
 	"github.com/imconfly/imconfly_go/transforms_conf"
 	"net/http"
 )

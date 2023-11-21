@@ -5,9 +5,11 @@ import (
 	"testing"
 )
 
-const TestDir = "/tmp/imconfly_tests"
-const TestDataDir = TestDir + "/data"
-const TestTmpDir = TestDir + "/tmp"
+const (
+	TestDir     = "/tmp/imconfly_tests"
+	TestDataDir = TestDir + "/data"
+	TestTmpDir  = TestDir + "/tmp"
+)
 
 func MarshalJSON(t *testing.T, value any) string {
 	b, err := json.MarshalIndent(value, "", "  ")

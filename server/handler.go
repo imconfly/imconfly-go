@@ -1,8 +1,9 @@
 package server
 
 import (
+	"github.com/imconfly/imconfly_go/core/queue"
+	"github.com/imconfly/imconfly_go/core/request"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
-	"github.com/imconfly/imconfly_go/queue"
 	"github.com/imconfly/imconfly_go/transforms_conf"
 	"net/http"
 )
@@ -44,11 +45,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Request(requestStr string) (os_tools.FileAbsPath, error) {
-	request, err := queue.RequestFromString(requestStr)
+	req, err := request.RequestFromString(requestStr)
 	if err != nil {
 		return "", err
 	}
-	task, err := h.trConf.ValidateRequest(request)
+	task, err := h.trConf.ValidateRequest(req)
 	if err != nil {
 		return "", err
 	}

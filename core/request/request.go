@@ -1,10 +1,11 @@
-package queue
+package request
 
 import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/imconfly/imconfly_go/core/origin"
 	o "github.com/imconfly/imconfly_go/lib/os_tools"
 	"path"
 	"strings"
@@ -29,14 +30,14 @@ func (r *Request) LocalAbsPath(dataDir o.DirAbsPath) o.FileAbsPath {
 }
 
 func (r *Request) IsOrigin() bool {
-	return r.Transform == OriginName
+	return r.Transform == origin.OriginName
 }
 
 func (r *Request) GetOriginRequest() *Request {
 	if r.IsOrigin() {
 		return r
 	}
-	return newRequest(r.Container, OriginName, r.PathLastPart)
+	return newRequest(r.Container, origin.OriginName, r.PathLastPart)
 }
 
 func newRequest(c, t string, p o.FileRelativePath) *Request {

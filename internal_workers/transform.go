@@ -2,9 +2,10 @@ package internal_workers
 
 import (
 	"fmt"
+	"github.com/imconfly/imconfly_go/core/origin"
+	"github.com/imconfly/imconfly_go/core/queue"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/lib/tmp_file"
-	"github.com/imconfly/imconfly_go/queue"
 )
 
 func TransformWorker(
@@ -59,7 +60,7 @@ func getOrigin(
 			return nil
 		}
 		// not exist - add current task in origin queue
-		if t.Origin.GetType() == queue.OriginTypeFS {
+		if t.Origin.GetType() == origin.OriginTypeFS {
 			return fmt.Errorf("origin not found: `%s`", *outOriginPath)
 		}
 
@@ -74,7 +75,7 @@ func getOrigin(
 			return nil
 		}
 		// not exist - create origin task and add to origin queue
-		if t.Origin.GetType() == queue.OriginTypeFS {
+		if t.Origin.GetType() == origin.OriginTypeFS {
 			return fmt.Errorf("origin not found: `%s`", *outOriginPath)
 		}
 		originTask := &queue.Task{

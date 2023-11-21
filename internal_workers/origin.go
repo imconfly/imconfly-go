@@ -1,9 +1,9 @@
 package internal_workers
 
 import (
+	"github.com/imconfly/imconfly_go/core/queue"
 	o "github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/lib/tmp_file"
-	"github.com/imconfly/imconfly_go/queue"
 )
 
 func OriginWorker(q *queue.Queue, dataDir, tmpDir o.DirAbsPath) {

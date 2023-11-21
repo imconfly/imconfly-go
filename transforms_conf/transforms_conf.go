@@ -3,16 +3,19 @@ package transforms_conf
 import (
 	"errors"
 	"fmt"
+	"github.com/imconfly/imconfly_go/core/origin"
+	"github.com/imconfly/imconfly_go/core/queue"
+	"github.com/imconfly/imconfly_go/core/request"
+	"github.com/imconfly/imconfly_go/core/transform"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
-	"github.com/imconfly/imconfly_go/queue"
 	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 )
 
 type Container struct {
-	Origin     queue.Origin
-	Transforms map[string]queue.Transform
+	Origin     origin.Origin
+	Transforms map[string]transform.Transform
 }
 
 // Conf - containers, origins and transforms configuration
@@ -22,10 +25,10 @@ type Conf struct {
 	Containers map[string]*Container
 }
 
-func (c *Conf) ValidateRequest(r *queue.Request) (*queue.Task, error) {
+func (c *Conf) ValidateRequest(r *request.Request) (*queue.Task, error) {
 	var container *Container
-	var origin *queue.Origin
-	var transform *queue.Transform
+	var orig *origin.Origin
+	var trans *transform.Transform
 
 	{
 		var found bool
@@ -33,12 +36,12 @@ func (c *Conf) ValidateRequest(r *queue.Request) (*queue.Task, error) {
 		if !found {
 			return nil, fmt.Errorf("bad request: container `%s` not exist", r.Container)
 		}
-		origin = &container.Origin
+		orig = &container.Origin
 	}
 
 	if r.IsOrigin() {
-		transform = nil
-		if !origin.Access {
+		trans = nil
+		if !orig.Access {
 			return nil, errors.New("forbidden")
 		}
 	} else {
@@ -46,13 +49,13 @@ func (c *Conf) ValidateRequest(r *queue.Request) (*queue.Task, error) {
 		if !found {
 			return nil, fmt.Errorf("bad request: transform name %q not exist", r.Transform)
 		}
-		transform = &t
+		trans = &t
 	}
 
 	task := queue.Task{
 		Request:   r,
-		Origin:    origin,
-		Transform: transform,
+		Origin:    orig,
+		Transform: trans,
 	}
 	return &task, nil
 }
@@ -86,10 +89,10 @@ func GetConf(reader io.Reader) (*Conf, error) {
 	// check what no "origin" transforms names
 	for containerName, container := range conf.Containers {
 		for transformName, _ := range container.Transforms {
-			if transformName == queue.OriginName {
+			if transformName == origin.OriginName {
 				return nil, fmt.Errorf(
 					"transform name cat`t be %q (in %q container)",
-					queue.OriginName,
+					origin.OriginName,
 					containerName,
 				)
 			}
