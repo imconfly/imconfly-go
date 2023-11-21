@@ -13,12 +13,12 @@ func OriginWorker(q *queue.Queue, dataDir, tmpDir o.DirAbsPath) {
 		if task == nil {
 			break
 		}
-		err := DoOneTask(task, dataDir, tmpDir)
+		err := doOneOriginTask(task, dataDir, tmpDir)
 		q.TaskDone(task.Request.Key, err)
 	}
 }
 
-func DoOneTask(task *queue.Task, dataDir, tmpDir o.DirAbsPath) error {
+func doOneOriginTask(task *queue.Task, dataDir, tmpDir o.DirAbsPath) error {
 	if !task.Request.IsOrigin() {
 		panic("impossible")
 	}

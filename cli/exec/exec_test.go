@@ -55,7 +55,7 @@ func testExec(t *testing.T, trConf *transforms_conf.Conf, request string) {
 	t.Logf("Data dir (dDir): %s", dataDir)
 	t.Logf("Tmp dir (tDir): %s", tmpDir)
 	var result string
-	err := Exec(
+	err := DoOneTask(
 		request,
 		dataDir,
 		tmpDir,

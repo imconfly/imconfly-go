@@ -35,7 +35,7 @@ func execAction(ctx *cli.Context) error {
 	}
 
 	var target string
-	if err := exec.Exec(arg, coreConf.DataDir, coreConf.TmpDir, trConf, &target); err != nil {
+	if err := exec.DoOneTask(arg, coreConf.DataDir, coreConf.TmpDir, trConf, &target); err != nil {
 		return err
 	}
 
