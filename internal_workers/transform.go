@@ -63,7 +63,9 @@ func getOrigin(
 		if t.Origin.GetType() == origin.OriginTypeFS {
 			return fmt.Errorf("origin not found: `%s`", *outOriginPath)
 		}
-
+		if originQ == nil {
+			panic("never")
+		}
 		return <-originQ.Add(t)
 	} else {
 		originRequest := t.Request.GetOriginRequest()
@@ -77,6 +79,9 @@ func getOrigin(
 		// not exist - create origin task and add to origin queue
 		if t.Origin.GetType() == origin.OriginTypeFS {
 			return fmt.Errorf("origin not found: `%s`", *outOriginPath)
+		}
+		if originQ == nil {
+			panic("never")
 		}
 		originTask := &queue.Task{
 			Request:   originRequest,

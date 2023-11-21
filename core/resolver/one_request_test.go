@@ -1,4 +1,4 @@
-package exec
+package resolver
 
 import (
 	"encoding/json"
@@ -14,10 +14,6 @@ const trConfFile = "../../testdata/imconfly.yaml"
 // https://upload.wikimedia.org/wikipedia/commons/4/41/Inter-Con_Kabul.jpg
 const originRequestString = "/wikimedia/origin/4/41/Inter-Con_Kabul.jpg"
 const transformRequestString = "/wikimedia/dummy/4/41/Inter-Con_Kabul.jpg"
-
-const testDir = testdata.TestDir
-const dataDir = testdata.TestDataDir
-const tmpDir = testdata.TestTmpDir
 
 func TestExec_originDefaultHTTPTransport(t *testing.T) {
 	trConf := getTrConf(t)
@@ -36,8 +32,8 @@ func TestExec_transform(t *testing.T) {
 }
 
 func clean(t *testing.T) {
-	t.Logf("Clean: rm dir %s", testDir)
-	if err := os.RemoveAll(testDir); err != nil {
+	t.Logf("Clean: rm dir %s", testdata.TestDir)
+	if err := os.RemoveAll(testdata.TestDir); err != nil {
 		t.Error(err)
 	}
 }
@@ -52,13 +48,13 @@ func testExec(t *testing.T, trConf *transforms_conf.Conf, request string) {
 	t.Logf("TrConf: %+v, %s", trConf, jsonMarshal(trConf))
 	t.Log("Exec(), test params are:")
 	t.Logf("Request (rStr): %s", request)
-	t.Logf("Data dir (dDir): %s", dataDir)
-	t.Logf("Tmp dir (tDir): %s", tmpDir)
+	t.Logf("Data dir (dDir): %s", testdata.TestDataDir)
+	t.Logf("Tmp dir (tDir): %s", testdata.TestTmpDir)
 	var result string
-	err := DoOneTask(
+	err := OneRequest(
 		request,
-		dataDir,
-		tmpDir,
+		testdata.TestDataDir,
+		testdata.TestTmpDir,
 		trConf,
 		&result,
 	)

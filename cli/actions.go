@@ -3,8 +3,8 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/imconfly/imconfly_go/cli/exec"
 	"github.com/imconfly/imconfly_go/configuration"
+	"github.com/imconfly/imconfly_go/core/resolver"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/server"
 	"github.com/imconfly/imconfly_go/transforms_conf"
@@ -35,7 +35,7 @@ func execAction(ctx *cli.Context) error {
 	}
 
 	var target string
-	if err := exec.DoOneTask(arg, coreConf.DataDir, coreConf.TmpDir, trConf, &target); err != nil {
+	if err := resolver.OneRequest(arg, coreConf.DataDir, coreConf.TmpDir, trConf, &target); err != nil {
 		return err
 	}
 

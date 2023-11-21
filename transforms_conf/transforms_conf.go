@@ -7,10 +7,8 @@ import (
 	"github.com/imconfly/imconfly_go/core/queue"
 	"github.com/imconfly/imconfly_go/core/request"
 	"github.com/imconfly/imconfly_go/core/transform"
-	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"gopkg.in/yaml.v2"
 	"io"
-	"os"
 )
 
 type Container struct {
@@ -19,10 +17,15 @@ type Container struct {
 }
 
 // Conf - containers, origins and transforms configuration
-// All requests have `container/ext_worker/path` type
-// if `ext_worker` == "origin" - exactly origin requested
+// All requests have `container/transform/path` type
+// if `transform` == "origin" - exactly origin requested
 type Conf struct {
 	Containers map[string]*Container
+}
+
+// HaveNonLocalOrigins - returns true if originQueue and origin workers needed
+func (c *Conf) HaveNonLocalOrigins() bool {
+	return true // @todo
 }
 
 func (c *Conf) ValidateRequest(r *request.Request) (*queue.Task, error) {
@@ -58,21 +61,6 @@ func (c *Conf) ValidateRequest(r *request.Request) (*queue.Task, error) {
 		Transform: trans,
 	}
 	return &task, nil
-}
-
-// MustGetConf is shortcut for GetConf, uses for tests only
-func MustGetConf(confFile os_tools.FileAbsPath) *Conf {
-	f, err := os.Open(string(confFile))
-	if err != nil {
-		panic(err.Error())
-	}
-	defer f.Close()
-
-	conf, err := GetConf(f)
-	if err != nil {
-		panic(err.Error())
-	}
-	return conf
 }
 
 func GetConf(reader io.Reader) (*Conf, error) {
