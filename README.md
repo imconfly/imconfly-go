@@ -1,4 +1,4 @@
-imconfly_go
+imconfly-go
 ===========
 
 Web server for full-custom images conversion on-the-fly. Fast cache, low resources consumption. 
@@ -7,7 +7,7 @@ Production/high-load-ready version. Written in Go.
 Status
 ======
 
-Most mostly works, but tools and docs needed.
+Mostly works, but tools and docs needed.
 
 Configuration
 =============
