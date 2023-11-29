@@ -1,0 +1,5 @@
+#!/bin/bash
+
+r=http://localhost:8081/bad-container/no-matter/no-matter
+echo $r
+curl -i $r

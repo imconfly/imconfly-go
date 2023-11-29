@@ -1,0 +1,5 @@
+#!/bin/bash
+
+r=http://localhost:8081/wikimedia/bad-transform/no-matter
+echo $r
+curl -i $r

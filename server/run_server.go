@@ -30,7 +30,8 @@ func RunServer(conf *configuration.Conf, trConf *transforms_conf.Conf) error {
 	handler := &Handler{
 		Resolver: resolver.NewResolver(transformsQ, trConf, conf.DataDir, conf.TmpDir),
 	}
+	handler2 := LoggingMiddleware(handler)
 
 	log.Infof("Server is listening on %s\n", conf.ServerAddr)
-	return http.ListenAndServe(conf.ServerAddr, handler)
+	return http.ListenAndServe(conf.ServerAddr, handler2)
 }

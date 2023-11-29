@@ -1,0 +1,6 @@
+#!/bin/bash
+
+r=http://localhost:8081/wikimedia/origin/not-found-on-origin
+echo $r
+curl -i $r
+echo

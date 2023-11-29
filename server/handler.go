@@ -13,7 +13,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fileAbsPath, err := h.Resolver.Request(r.RequestURI)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	} else {
+		http.ServeFile(w, r, string(fileAbsPath))
 	}
-	http.ServeFile(w, r, string(fileAbsPath))
 }
