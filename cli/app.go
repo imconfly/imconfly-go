@@ -24,12 +24,12 @@ var App = &cli.App{
 			Action: versionAction,
 		},
 		{
-			Name:   "configuration",
+			Name:   "conf",
 			Usage:  "print config in JSON format",
 			Action: configAction,
 		},
 		{
-			Name:   "tr-configuration",
+			Name:   "tr-conf",
 			Usage:  "print transforms config in JSON format",
 			Action: trConfAction,
 		},
