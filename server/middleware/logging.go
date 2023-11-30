@@ -1,4 +1,4 @@
-package server
+package middleware
 
 import (
 	log "github.com/sirupsen/logrus"
@@ -11,12 +11,12 @@ type statusResponseWriter struct {
 	status int
 }
 
-func (s *statusResponseWriter) WriteHeader(code int) {
+func (s *statusResponseWriter) writeHeader(code int) {
 	s.status = code
 	s.ResponseWriter.WriteHeader(code)
 }
 
-func LoggingMiddleware(next http.Handler) http.Handler {
+func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			startTime := time.Now()

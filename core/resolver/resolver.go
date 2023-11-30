@@ -34,6 +34,7 @@ func NewResolver(transformsQ *queue.Queue, trConf *transforms_conf.Conf, dataDir
 	}
 }
 
+// @todo: ctx
 func (r *Resolver) Request(requestStr string) (os_tools.FileAbsPath, error) {
 	req, err := request.RequestFromString(requestStr)
 	if err != nil {

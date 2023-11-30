@@ -1,4 +1,4 @@
-package server
+package handler
 
 import (
 	"github.com/imconfly/imconfly_go/core/resolver"
