@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"errors"
 	"github.com/imconfly/imconfly_go/core/resolver"
+	errors2 "github.com/imconfly/imconfly_go/core/resolver/errors"
 	"net/http"
 )
 
@@ -18,7 +20,12 @@ func NewHandler(rs *resolver.Resolver) http.Handler {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fileAbsPath, err := h.resolver.Request(r.RequestURI)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+		var rErr *errors2.ResolverError
+		if errors.As(err, &rErr) {
+			status = rErr.HTTPCode
+		}
+		http.Error(w, err.Error(), status)
 	} else {
 		http.ServeFile(w, r, string(fileAbsPath))
 	}

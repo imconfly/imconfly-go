@@ -4,9 +4,11 @@ import (
 	"github.com/imconfly/imconfly_go/core/internal_workers"
 	"github.com/imconfly/imconfly_go/core/queue"
 	"github.com/imconfly/imconfly_go/core/request"
+	"github.com/imconfly/imconfly_go/core/resolver/errors"
 	"github.com/imconfly/imconfly_go/core/transforms_conf"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	log "github.com/sirupsen/logrus"
+	"net/http"
 )
 
 type Resolver struct {
@@ -52,7 +54,10 @@ func NewResolver(
 func (r *Resolver) Request(requestStr string) (os_tools.FileAbsPath, error) {
 	req, err := request.RequestFromString(requestStr)
 	if err != nil {
-		return "", err
+		return "", &errors.ResolverError{
+			HTTPCode: http.StatusBadRequest,
+			Err:      err,
+		}
 	}
 	task, err := r.trConf.ValidateRequest(req)
 	if err != nil {
