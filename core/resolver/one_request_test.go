@@ -50,14 +50,7 @@ func testExec(t *testing.T, trConf *transforms_conf.Conf, request string) {
 	t.Logf("Request (rStr): %s", request)
 	t.Logf("Data dir (dDir): %s", testdata.TestDataDir)
 	t.Logf("Tmp dir (tDir): %s", testdata.TestTmpDir)
-	var result string
-	err := OneRequest(
-		request,
-		testdata.TestDataDir,
-		testdata.TestTmpDir,
-		trConf,
-		&result,
-	)
+	result, err := NewResolver(1, testdata.TestDataDir, testdata.TestTmpDir, trConf).Request(request)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,10 +1,12 @@
 package resolver
 
 import (
+	"github.com/imconfly/imconfly_go/core/internal_workers"
 	"github.com/imconfly/imconfly_go/core/queue"
 	"github.com/imconfly/imconfly_go/core/request"
 	"github.com/imconfly/imconfly_go/core/transforms_conf"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
+	log "github.com/sirupsen/logrus"
 )
 
 type Resolver struct {
@@ -14,18 +16,30 @@ type Resolver struct {
 	tmpDir      os_tools.DirAbsPath
 }
 
-// NewResolver
-// before create Resolver you must create both origin and transform queue,
-// and also origin and transform workers (pools)
-// Minimal example:
-//
-//	originQ := queue.NewQueue()
-//	transformQ := queue.NewQueue()
-//	defer transformQ.Close()
-//	defer originQ.Close()
-//	go internal_workers.OriginWorker(originQ, dataDir, tmpDir)
-//	go internal_workers.TransformWorker(transformQ, originQ, dataDir, tmpDir)
-func NewResolver(transformsQ *queue.Queue, trConf *transforms_conf.Conf, dataDir, tmpDir os_tools.DirAbsPath) *Resolver {
+func NewResolver(
+	concurrency int, // for both origins and transforms - it`s ok yet
+	dataDir os_tools.DirAbsPath,
+	tmpDir os_tools.DirAbsPath,
+	trConf *transforms_conf.Conf,
+) *Resolver {
+	var originQ *queue.Queue
+	if trConf.HaveNonLocalOrigins() {
+		log.Debug("Non-local origins found.")
+		originQ = queue.NewQueue()
+		for i := 0; i < concurrency; i++ {
+			go internal_workers.OriginWorker(originQ, dataDir, tmpDir)
+		}
+		log.Debugf("Origin workers started: %d", concurrency)
+	} else {
+		log.Debug("Only local origins - no origin queue/workers started.")
+	}
+
+	transformsQ := queue.NewQueue()
+	for i := 0; i < concurrency; i++ {
+		go internal_workers.TransformWorker(transformsQ, originQ, dataDir, tmpDir)
+	}
+	log.Debugf("Transforms workers started: %d", concurrency)
+
 	return &Resolver{
 		transformsQ: transformsQ,
 		trConf:      trConf,

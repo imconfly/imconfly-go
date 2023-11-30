@@ -34,8 +34,8 @@ func execAction(ctx *cli.Context) error {
 		return cli.Exit(err.Error(), 78)
 	}
 
-	var target string
-	if err := resolver.OneRequest(arg, coreConf.DataDir, coreConf.TmpDir, trConf, &target); err != nil {
+	target, err := resolver.NewResolver(1, coreConf.DataDir, coreConf.TmpDir, trConf).Request(arg)
+	if err != nil {
 		return err
 	}
 

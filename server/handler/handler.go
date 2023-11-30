@@ -6,11 +6,17 @@ import (
 )
 
 type Handler struct {
-	Resolver *resolver.Resolver
+	resolver *resolver.Resolver
+}
+
+func NewHandler(rs *resolver.Resolver) http.Handler {
+	return &Handler{
+		resolver: rs,
+	}
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fileAbsPath, err := h.Resolver.Request(r.RequestURI)
+	fileAbsPath, err := h.resolver.Request(r.RequestURI)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {
