@@ -3,30 +3,57 @@ package handler
 import (
 	"errors"
 	"github.com/imconfly/imconfly_go/core/resolver"
-	errors2 "github.com/imconfly/imconfly_go/core/resolver/errors"
+	rsErrors "github.com/imconfly/imconfly_go/core/resolver/errors"
+	"github.com/sirupsen/logrus"
 	"net/http"
+	"time"
 )
 
 type Handler struct {
 	resolver *resolver.Resolver
+	logger   *logrus.Logger
 }
 
-func NewHandler(rs *resolver.Resolver) http.Handler {
+func NewHandler(rs *resolver.Resolver, logger *logrus.Logger) http.Handler {
 	return &Handler{
 		resolver: rs,
+		logger:   logger,
 	}
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	startTime := time.Now()
 	fileAbsPath, err := h.resolver.Request(r.RequestURI)
+	status := http.StatusOK
 	if err != nil {
-		status := http.StatusInternalServerError
-		var rErr *errors2.ResolverError
+		status = http.StatusInternalServerError
+		var rErr *rsErrors.ResolverError
 		if errors.As(err, &rErr) {
 			status = rErr.HTTPCode
 		}
 		http.Error(w, err.Error(), status)
 	} else {
-		http.ServeFile(w, r, string(fileAbsPath))
+		srw := newSRW(w)
+		http.ServeFile(srw, r, string(fileAbsPath))
+		status = srw.status
+	}
+
+	// logging
+
+	duration := time.Since(startTime)
+	if err != nil {
+		h.logger.Errorf(
+			"%d %s\t%s\t%s\t%s",
+			status,
+			http.StatusText(status),
+			duration,
+			r.RequestURI,
+			err.Error())
+	} else {
+		h.logger.Infof(
+			"%d\t%s\t%s",
+			status,
+			duration,
+			r.RequestURI)
 	}
 }
