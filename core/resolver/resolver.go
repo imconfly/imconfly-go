@@ -28,12 +28,11 @@ func NewResolver(
 ) *Resolver {
 	var originQ *queue.Queue
 	if trConf.HaveNonLocalOrigins() {
-		log.Debug("Non-local origins found.")
 		originQ = queue.NewQueue()
 		for i := 0; i < concurrency; i++ {
 			go internal_workers.OriginWorker(originQ, dataDir, tmpDir)
 		}
-		log.Debugf("Origin workers started: %d", concurrency)
+		log.Debugf("Found non local origins. Origin workers started: %d", concurrency)
 	} else {
 		log.Debug("Only local origins - no origin queue/workers started.")
 	}
@@ -52,7 +51,6 @@ func NewResolver(
 	}
 }
 
-// @todo: ctx
 func (r *Resolver) Request(requestStr string) (result os_tools.FileAbsPath, err error) {
 	req, err := request.RequestFromString(requestStr)
 	if err != nil {

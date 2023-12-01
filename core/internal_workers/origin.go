@@ -1,9 +1,11 @@
 package internal_workers
 
 import (
+	"fmt"
 	"github.com/imconfly/imconfly_go/core/queue"
 	o "github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/lib/tmp_file"
+	log "github.com/sirupsen/logrus"
 )
 
 func OriginWorker(q *queue.Queue, dataDir, tmpDir o.DirAbsPath) {
@@ -13,7 +15,11 @@ func OriginWorker(q *queue.Queue, dataDir, tmpDir o.DirAbsPath) {
 		if task == nil {
 			break
 		}
+		log.Debugf("get origin for task: %s", task.Request.Key)
 		err := doOneOriginTask(task, dataDir, tmpDir)
+		if err != nil {
+			err = fmt.Errorf("get origin error: %w", err)
+		}
 		q.TaskDone(task.Request.Key, err)
 	}
 }

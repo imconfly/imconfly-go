@@ -1,12 +1,11 @@
 package transform
 
 import (
-	"bytes"
-	"fmt"
 	"github.com/imconfly/imconfly_go/lib/exec"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
-	"os"
+	log "github.com/sirupsen/logrus"
 	oexec "os/exec"
+	"strings"
 )
 
 type Transform string
@@ -21,12 +20,13 @@ func (t Transform) Execute(source, target os_tools.FileAbsPath) error {
 		return err
 	}
 
+	log.Debugf("exec command: %s %s", cmdName, strings.Join(cmdArgs, " "))
 	cmd := oexec.Command(cmdName, cmdArgs...)
-	var outB, errB bytes.Buffer
-	cmd.Stdout = &outB
-	cmd.Stderr = &errB
+	// var outB, errB bytes.Buffer
+	// cmd.Stdout = &outB
+	// cmd.Stderr = &errB
 	err = cmd.Run()
-	fmt.Println(outB.String())
-	_, _ = fmt.Fprintln(os.Stderr, errB.String())
+	// fmt.Println(outB.String())
+	// _, _ = fmt.Fprintln(os.Stderr, errB.String())
 	return err
 }

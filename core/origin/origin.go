@@ -1,11 +1,11 @@
 package origin
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/imconfly/imconfly_go/lib/exec"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"os"
@@ -86,13 +86,14 @@ func (o *Origin) ExecTransport(suffix string, tmpPath os_tools.FileAbsPath) erro
 	if err != nil {
 		return err
 	}
+	log.Debugf("exec command: %s %s", cmdName, strings.Join(cmdArgs, " "))
 
 	cmd := oexec.Command(cmdName, cmdArgs...)
-	var outB, errB bytes.Buffer
-	cmd.Stdout = &outB
-	cmd.Stderr = &errB
+	//var outB, errB bytes.Buffer
+	//cmd.Stdout = &outB
+	//cmd.Stderr = &errB
 	err = cmd.Run()
-	fmt.Println(outB.String())
-	_, _ = fmt.Fprintln(os.Stderr, errB.String())
+	//fmt.Println(outB.String())
+	//_, _ = fmt.Fprintln(os.Stderr, errB.String())
 	return err
 }

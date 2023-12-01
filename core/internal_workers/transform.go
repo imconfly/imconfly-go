@@ -6,6 +6,7 @@ import (
 	"github.com/imconfly/imconfly_go/core/queue"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/lib/tmp_file"
+	log "github.com/sirupsen/logrus"
 )
 
 func TransformWorker(
@@ -20,7 +21,11 @@ func TransformWorker(
 		if task == nil {
 			break
 		}
+		log.Debugf("do task: %s", task.Request.Key)
 		err := doTask(task, originQ, dataDir, tmpDir)
+		if err != nil {
+			err = fmt.Errorf("transform error: %w", err)
+		}
 		transformsQ.TaskDone(task.Request.Key, err)
 	}
 }
