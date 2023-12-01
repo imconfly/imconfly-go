@@ -42,7 +42,7 @@ func (c *Conf) ValidateRequest(r *request.Request) (*queue.Task, error) {
 		var found bool
 		container, found = c.Containers[r.Container]
 		if !found {
-			return nil, fmt.Errorf("bad request: container `%s` not exist", r.Container)
+			return nil, fmt.Errorf("container `%s` not exist", r.Container)
 		}
 		orig = &container.Origin
 	}
@@ -55,7 +55,7 @@ func (c *Conf) ValidateRequest(r *request.Request) (*queue.Task, error) {
 	} else {
 		t, found := container.Transforms[r.Transform]
 		if !found {
-			return nil, fmt.Errorf("bad request: transform name %q not exist", r.Transform)
+			return nil, fmt.Errorf("transform name %q not exist", r.Transform)
 		}
 		trans = &t
 	}

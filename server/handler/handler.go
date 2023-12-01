@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/imconfly/imconfly_go/core/resolver"
-	rsErrors "github.com/imconfly/imconfly_go/core/resolver/errors"
+	rsErrors "github.com/imconfly/imconfly_go/core/resolver/resolver_errors"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
@@ -27,7 +27,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	status := http.StatusOK
 	if err != nil {
 		status = http.StatusInternalServerError
-		var rErr *rsErrors.ResolverError
+		var rErr *rsErrors.Error
 		if errors.As(err, &rErr) {
 			status = rErr.HTTPCode
 		}

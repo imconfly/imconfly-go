@@ -58,7 +58,7 @@ func RequestFromString(httpGet string) (*Request, error) {
 	}
 	parts := strings.Split(httpGet, "/")
 	if len(parts) < 4 {
-		return nil, fmt.Errorf("bad request: no `/container/transform/path` pattern in `%s`", httpGet)
+		return nil, fmt.Errorf("no `/container/transform/path` pattern in `%s`", httpGet)
 	}
 
 	out := newRequest(

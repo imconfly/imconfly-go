@@ -1,10 +1,12 @@
 package resolver
 
 import (
+	"errors"
+	"fmt"
 	"github.com/imconfly/imconfly_go/core/internal_workers"
 	"github.com/imconfly/imconfly_go/core/queue"
 	"github.com/imconfly/imconfly_go/core/request"
-	"github.com/imconfly/imconfly_go/core/resolver/errors"
+	"github.com/imconfly/imconfly_go/core/resolver/resolver_errors"
 	"github.com/imconfly/imconfly_go/core/transforms_conf"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	log "github.com/sirupsen/logrus"
@@ -51,27 +53,37 @@ func NewResolver(
 }
 
 // @todo: ctx
-func (r *Resolver) Request(requestStr string) (os_tools.FileAbsPath, error) {
+func (r *Resolver) Request(requestStr string) (result os_tools.FileAbsPath, err error) {
 	req, err := request.RequestFromString(requestStr)
 	if err != nil {
-		return "", &errors.ResolverError{
-			HTTPCode: http.StatusBadRequest,
-			Err:      err,
-		}
+		err = resolver_errors.New(http.StatusBadRequest, fmt.Errorf("request format error: %w", err))
+		return
 	}
 	task, err := r.trConf.ValidateRequest(req)
 	if err != nil {
-		return "", err
+		err = resolver_errors.New(
+			http.StatusBadRequest,
+			fmt.Errorf("request don`t match transforms conf: %w", err))
+		return
 	}
-	out := task.Request.LocalAbsPath(r.dataDir)
-	exist, err := os_tools.FileExist(out)
+	result = task.Request.LocalAbsPath(r.dataDir)
+	exist, err := os_tools.FileExist(result)
+	// fs error probably or something like this...
 	if err != nil {
-		return "", err
+		return
 	}
+	// nothing to do
 	if exist {
-		return out, nil
+		return
 	}
 
 	err = <-r.transformsQ.Add(task)
-	return out, err
+	if err != nil {
+		var rsError *resolver_errors.Error
+		if errors.As(err, &rsError) {
+			return
+		}
+		err = resolver_errors.New(http.StatusInternalServerError, fmt.Errorf("transform error: %w", err))
+	}
+	return
 }
