@@ -1,6 +1,8 @@
 #!/bin/bash
 
-r=http://localhost:8081/wikimedia/origin/not-found-on-origin
-echo $r
-curl -i $r
+source "$(dirname $0)/common.bash"
+REQUEST=http://$HOST:$PORT/wikimedia/origin/not-found-on-origin
+
+echo $REQUEST
+curl -i $REQUEST
 echo

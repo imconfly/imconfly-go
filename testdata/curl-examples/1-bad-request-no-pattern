@@ -1,5 +1,7 @@
 #!/bin/bash
 
-r=http://localhost:8081/some
-echo $r
-curl -i $r
+source "$(dirname $0)/common.bash"
+REQUEST=http://$HOST:$PORT/some
+
+echo $REQUEST
+curl -i $REQUEST
