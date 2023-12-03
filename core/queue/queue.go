@@ -16,14 +16,14 @@ type Task struct {
 }
 
 type Queue struct {
-	mu    sync.Mutex
+	mu    sync.RWMutex
 	tsMap map[os_tools.FileRelativePath][]chan error
 	queue chan *Task
 }
 
 func NewQueue() *Queue {
 	return &Queue{
-		mu:    sync.Mutex{},
+		mu:    sync.RWMutex{},
 		tsMap: make(map[os_tools.FileRelativePath][]chan error),
 		queue: make(chan *Task),
 	}
@@ -32,6 +32,8 @@ func NewQueue() *Queue {
 // Close queue channel
 // From now Get() returns nil and Add() throws panic on new tasks
 func (q *Queue) Close() {
+	q.mu.Lock()
+	defer q.mu.Unlock()
 	close(q.queue)
 }
 
@@ -41,9 +43,11 @@ func (q *Queue) Add(task *Task) chan error {
 
 	ch := make(chan error, 1)
 
-	if alreadyAdded, found := q.tsMap[task.Request.Key]; found {
-		alreadyAdded = append(alreadyAdded, ch)
+	if oldSlice, ok := q.tsMap[task.Request.Key]; ok {
+		// just add subscriber
+		oldSlice = append(oldSlice, ch)
 	} else {
+		// add new task and add subscriber
 		q.tsMap[task.Request.Key] = []chan error{ch}
 		q.queue <- task
 	}
@@ -52,6 +56,8 @@ func (q *Queue) Add(task *Task) chan error {
 }
 
 func (q *Queue) Get() *Task {
+	q.mu.RLock()
+	defer q.mu.RUnlock()
 	return <-q.queue
 }
 
