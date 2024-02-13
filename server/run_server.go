@@ -15,7 +15,7 @@ func RunServer(conf *configuration.Conf, trConf *transforms_conf.Conf) error {
 		conf.DataDir,
 		conf.TmpDir,
 		trConf)
-	h := handler.NewHandler(rs, log.StandardLogger())
+	h := handler.NewHandler(rs)
 
 	log.Infof("Server is listening on %s\n", conf.ServerAddr)
 	return http.ListenAndServe(conf.ServerAddr, h)

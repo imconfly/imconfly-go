@@ -32,16 +32,16 @@ func NewResolver(
 		for i := 0; i < concurrency; i++ {
 			go internal_workers.OriginWorker(originQ, dataDir, tmpDir)
 		}
-		log.Debugf("Found non local origins. Origin workers started: %d", concurrency)
+		log.Debugf("NewResolver(): Found non local origins. Origin workers started: %d", concurrency)
 	} else {
-		log.Debug("Only local origins - no origin queue/workers started.")
+		log.Debug("NewResolver(): Only local origins - no origin queue/workers started.")
 	}
 
 	transformsQ := queue.NewQueue()
 	for i := 0; i < concurrency; i++ {
 		go internal_workers.TransformWorker(transformsQ, originQ, dataDir, tmpDir)
 	}
-	log.Debugf("Transforms workers started: %d", concurrency)
+	log.Debugf("NewResolver(): Transforms workers started: %d", concurrency)
 
 	return &Resolver{
 		transformsQ: transformsQ,
@@ -52,9 +52,12 @@ func NewResolver(
 }
 
 func (r *Resolver) Request(requestStr string) (result os_tools.FileAbsPath, err error) {
+	logName := fmt.Sprintf("Resolver.Request(%s)", requestStr)
+
 	req, err := request.RequestFromString(requestStr)
 	if err != nil {
 		err = resolver_errors.New(http.StatusBadRequest, fmt.Errorf("request format error: %w", err))
+		log.Errorf("%s: %s", logName, err.Error())
 		return
 	}
 	task, err := r.trConf.ValidateRequest(req)
@@ -62,18 +65,22 @@ func (r *Resolver) Request(requestStr string) (result os_tools.FileAbsPath, err 
 		err = resolver_errors.New(
 			http.StatusBadRequest,
 			fmt.Errorf("request don`t match transforms conf: %w", err))
+		log.Errorf("%s: %s", logName, err.Error())
 		return
 	}
 	result = task.Request.LocalAbsPath(r.dataDir)
 	exist, err := os_tools.FileExist(result)
 	// fs error probably or something like this...
 	if err != nil {
+		log.Errorf("%s: %s", logName, err.Error())
 		return
 	}
 	// nothing to do
 	if exist {
+		log.Debugf("%s: file exist: %s. Return.", logName, result)
 		return
 	}
+	log.Debugf("%s: file not exist: %s. Add task to transforms queue and waiting.", logName, result)
 
 	err = <-r.transformsQ.Add(task)
 	if err != nil {
@@ -82,6 +89,8 @@ func (r *Resolver) Request(requestStr string) (result os_tools.FileAbsPath, err 
 			return
 		}
 		err = resolver_errors.New(http.StatusInternalServerError, fmt.Errorf("transform error: %w", err))
+		log.Errorf("%s: %s", logName, err.Error())
 	}
+	log.Debugf("%s: Task done.", logName)
 	return
 }

@@ -15,13 +15,15 @@ func TransformWorker(
 	dataDir,
 	tmpDir os_tools.DirAbsPath,
 ) {
+	logName := "TransformWorker()"
 	for {
 		task := transformsQ.Get()
 		// queue channel closed
 		if task == nil {
+			log.Debugf("%s: queue channel closed. Return.", logName)
 			break
 		}
-		log.Debugf("do task: %s", task.Request.Key)
+		log.Debugf("%s: task recieved from queue: %s", logName, task.Request.Key)
 		err := doTask(task, originQ, dataDir, tmpDir)
 		if err != nil {
 			err = fmt.Errorf("transform error: %w", err)

@@ -6,6 +6,7 @@ import (
 	"github.com/imconfly/imconfly_go/core/request"
 	"github.com/imconfly/imconfly_go/core/transform"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
+	log "github.com/sirupsen/logrus"
 	"sync"
 )
 
@@ -16,14 +17,14 @@ type Task struct {
 }
 
 type Queue struct {
-	mu    sync.RWMutex
+	mu    *sync.Mutex
 	tsMap map[os_tools.FileRelativePath][]chan error
 	queue chan *Task
 }
 
 func NewQueue() *Queue {
 	return &Queue{
-		mu:    sync.RWMutex{},
+		mu:    new(sync.Mutex),
 		tsMap: make(map[os_tools.FileRelativePath][]chan error),
 		queue: make(chan *Task),
 	}
@@ -38,6 +39,8 @@ func (q *Queue) Close() {
 }
 
 func (q *Queue) Add(task *Task) chan error {
+	logName := fmt.Sprintf("Queue.Add(%s)", task.Request.Key)
+
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
@@ -46,18 +49,18 @@ func (q *Queue) Add(task *Task) chan error {
 	if oldSlice, ok := q.tsMap[task.Request.Key]; ok {
 		// just add subscriber
 		oldSlice = append(oldSlice, ch)
+		log.Debugf("%s: task already exists, just add subscriber.", logName)
 	} else {
 		// add new task and add subscriber
 		q.tsMap[task.Request.Key] = []chan error{ch}
 		q.queue <- task
+		log.Debugf("%s: add new task.", logName)
 	}
 
 	return ch
 }
 
 func (q *Queue) Get() *Task {
-	q.mu.RLock()
-	defer q.mu.RUnlock()
 	return <-q.queue
 }
 

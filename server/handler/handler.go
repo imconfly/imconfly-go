@@ -2,27 +2,29 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"github.com/imconfly/imconfly_go/core/resolver"
 	rsErrors "github.com/imconfly/imconfly_go/core/resolver/resolver_errors"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
 
 type Handler struct {
 	resolver *resolver.Resolver
-	logger   *logrus.Logger
 }
 
-func NewHandler(rs *resolver.Resolver, logger *logrus.Logger) http.Handler {
+func NewHandler(rs *resolver.Resolver) http.Handler {
 	return &Handler{
 		resolver: rs,
-		logger:   logger,
 	}
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	startTime := time.Now()
+	logName := fmt.Sprintf("Hanler.ServeHTTP(%s)", r.RequestURI)
+	log.Debug(logName)
+
 	fileAbsPath, err := h.resolver.Request(r.RequestURI)
 	status := http.StatusOK
 	if err != nil {
@@ -42,18 +44,18 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	duration := time.Since(startTime)
 	if err != nil {
-		h.logger.Errorf(
-			"%d %s\t%s\t%s\t%s",
+		log.Errorf(
+			"%s: %d %s\t%s\t%s",
+			logName,
 			status,
 			http.StatusText(status),
 			duration,
-			r.RequestURI,
 			err.Error())
 	} else {
-		h.logger.Infof(
-			"%d\t%s\t%s",
+		log.Infof(
+			"%s: %d\t%s\t",
+			logName,
 			status,
-			duration,
-			r.RequestURI)
+			duration)
 	}
 }
