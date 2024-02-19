@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/imconfly/imconfly_go/configuration"
+	"github.com/imconfly/imconfly_go/constants"
 	"github.com/imconfly/imconfly_go/core/resolver"
 	"github.com/imconfly/imconfly_go/core/transforms_conf"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
 	"github.com/imconfly/imconfly_go/server"
-	"github.com/imconfly/imconfly_go/version"
 	"github.com/urfave/cli/v2"
 	"os"
 )
@@ -44,7 +44,7 @@ func execAction(ctx *cli.Context) error {
 }
 
 func versionAction(_ *cli.Context) error {
-	fmt.Println(version.Version)
+	fmt.Println(constants.Version)
 	return nil
 }
 
