@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	defaultConfFile = "/usr/local/etc/imconfly.yaml"
+	defaultConfFile = "/usr/local/etc/imconfly.json"
 	confFileEnvVar  = "IMCONFLY_CONF_FILE"
 )
 

@@ -15,6 +15,7 @@ type Conf struct {
 	TmpDir               o.DirAbsPath
 	ServerHost           string
 	ServerPort           int
+	Containers           Containers
 }
 
 func ReadConf(reader io.Reader) (*Conf, error) {
@@ -36,7 +37,10 @@ func ReadConf(reader io.Reader) (*Conf, error) {
 		return nil, fmt.Errorf("JSON parser error: %w", err)
 	}
 
-	// @todo: check
+	// check containers for correct configuration
+	if err := conf.Containers.Check(); err != nil {
+		return nil, err
+	}
 
 	return conf, nil
 }

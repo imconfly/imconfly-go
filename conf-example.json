@@ -1,7 +1,20 @@
 {
-    "TransformConcurrency": 2,
-    "DataDir": "/tmp/imconfly/data",
-    "TmpDir": "/tmp/imconfly/tmp",
-    "ServerHost": "127.0.0.1",
-    "ServerPort": 8082
+	"TransformConcurrency": 2,
+	"DataDir": "/tmp/imconfly/data",
+	"TmpDir": "/tmp/imconfly/tmp",
+	"ServerHost": "127.0.0.1",
+	"ServerPort": 8082,
+	"Containers": {
+		"wikimedia": {
+			"_comment_": "https://upload.wikimedia.org/wikipedia/commons/4/41/Inter-Con_Kabul.jpg",
+			"Origin": {
+				"Source": "https://upload.wikimedia.org/wikipedia/commons",
+				"Transport": "curl {source} --output {target}",
+				"Access": true
+			},
+			"Transforms": {
+				"dummy": "cp {source} {target}"
+			}
+		}
+	}
 }
