@@ -73,6 +73,11 @@ func wrongUsage() {
 
 func serveCommand() {
 	c := getConf()
+	if err := config.CheckDirs(c.DataDir, c.TmpDir); err != nil {
+		log.Errorf("%s", err)
+	}
+	log.Debugf("DataDir: %s, TmpDir: %s. Ok.", c.DataDir, c.TmpDir)
+
 	err := server.RunServer(c)
 	fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 	os.Exit(constants.ExSoftware)
