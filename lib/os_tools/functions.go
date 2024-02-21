@@ -3,6 +3,7 @@ package os_tools
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path"
 )
@@ -32,14 +33,27 @@ func MkdirFor(pa FileAbsPath) error {
 }
 
 func FileExist(pa FileAbsPath) (bool, error) {
-	_, err := os.Stat(string(pa))
-	if err == nil {
-		return true, nil
-	}
-	if errors.Is(err, os.ErrNotExist) {
+	stringPath := string(pa)
+
+	if fileInfo, err := os.Stat(stringPath); err == nil {
+		if fileInfo.IsDir() {
+			return false, fmt.Errorf("this is a directory: %s", stringPath)
+		} else {
+			return true, nil
+		}
+	} else if os.IsNotExist(err) {
 		return false, nil
+	} else {
+		// floating error: stat xxx: not a directory
+		var pathError *fs.PathError
+		// @todo
+		if errors.As(err, &pathError) && pathError.Err.Error() == "not a directory" {
+			return false, nil
+		}
+
+		return false, err
+
 	}
-	return false, err
 }
 
 func Remove(pa FileAbsPath) error {

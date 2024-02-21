@@ -1,7 +1,7 @@
 {
 	"TransformConcurrency": 2,
-	"DataDir": "/tmp/imconfly/data",
-	"TmpDir": "/tmp/imconfly/tmp",
+	"DataDir": "/var/local/imconfly/data",
+	"TmpDir": "/var/local/imconfly/tmp",
 	"ServerHost": "127.0.0.1",
 	"ServerPort": 8082,
 	"Containers": {

@@ -3,19 +3,21 @@ package resolver
 import (
 	"errors"
 	"fmt"
+	"net/http"
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/imconfly/imconfly_go/config"
 	"github.com/imconfly/imconfly_go/core/internal_workers"
 	"github.com/imconfly/imconfly_go/core/queue"
 	"github.com/imconfly/imconfly_go/core/request"
 	"github.com/imconfly/imconfly_go/core/resolver/resolver_errors"
-	"github.com/imconfly/imconfly_go/core/transforms_conf"
 	"github.com/imconfly/imconfly_go/lib/os_tools"
-	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 type Resolver struct {
 	transformsQ *queue.Queue
-	trConf      *transforms_conf.Conf
+	containers  config.Containers
 	dataDir     os_tools.DirAbsPath
 	tmpDir      os_tools.DirAbsPath
 }
@@ -24,10 +26,10 @@ func NewResolver(
 	concurrency int, // for both origins and transforms - it`s ok yet
 	dataDir os_tools.DirAbsPath,
 	tmpDir os_tools.DirAbsPath,
-	trConf *transforms_conf.Conf,
+	containers config.Containers,
 ) *Resolver {
 	var originQ *queue.Queue
-	if trConf.HaveNonLocalOrigins() {
+	if containers.HaveNonLocalOrigins() {
 		originQ = queue.NewQueue()
 		for i := 0; i < concurrency; i++ {
 			go internal_workers.OriginWorker(originQ, dataDir, tmpDir)
@@ -45,7 +47,7 @@ func NewResolver(
 
 	return &Resolver{
 		transformsQ: transformsQ,
-		trConf:      trConf,
+		containers:  containers,
 		dataDir:     dataDir,
 		tmpDir:      tmpDir,
 	}
@@ -57,10 +59,10 @@ func (r *Resolver) Request(requestStr string) (result os_tools.FileAbsPath, err 
 	req, err := request.RequestFromString(requestStr)
 	if err != nil {
 		err = resolver_errors.New(http.StatusBadRequest, fmt.Errorf("request format error: %w", err))
-		log.Errorf("%s: %s", logName, err.Error())
+		log.Debugf("%s: %s", logName, err.Error())
 		return
 	}
-	task, err := r.trConf.ValidateRequest(req)
+	task, err := r.containers.ValidateRequest(req)
 	if err != nil {
 		err = resolver_errors.New(
 			http.StatusBadRequest,
@@ -72,7 +74,7 @@ func (r *Resolver) Request(requestStr string) (result os_tools.FileAbsPath, err 
 	exist, err := os_tools.FileExist(result)
 	// fs error probably or something like this...
 	if err != nil {
-		log.Errorf("%s: %s", logName, err.Error())
+		log.Debugf("%s: %s", logName, err.Error())
 		return
 	}
 	// nothing to do

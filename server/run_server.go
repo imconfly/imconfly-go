@@ -1,22 +1,24 @@
 package server
 
 import (
-	"github.com/imconfly/imconfly_go/configuration"
+	"fmt"
+	"github.com/imconfly/imconfly_go/config"
 	"github.com/imconfly/imconfly_go/core/resolver"
-	"github.com/imconfly/imconfly_go/core/transforms_conf"
 	"github.com/imconfly/imconfly_go/server/handler"
 	log "github.com/sirupsen/logrus"
+
 	"net/http"
 )
 
-func RunServer(conf *configuration.Conf, trConf *transforms_conf.Conf) error {
+func RunServer(conf *config.Conf) error {
 	rs := resolver.NewResolver(
 		conf.TransformConcurrency,
 		conf.DataDir,
 		conf.TmpDir,
-		trConf)
+		conf.Containers)
 	h := handler.NewHandler(rs)
 
-	log.Infof("Server is listening on %s\n", conf.ServerAddr)
-	return http.ListenAndServe(conf.ServerAddr, h)
+	addr := fmt.Sprintf("%s:%d", conf.ServerHost, conf.ServerPort)
+	log.Infof("Server is listening on %s\n", addr)
+	return http.ListenAndServe(addr, h)
 }

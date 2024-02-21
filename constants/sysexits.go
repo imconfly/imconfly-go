@@ -5,6 +5,7 @@ package constants
 // man sysexits (on BSD systems)
 
 const (
-	ExUsage  = 65 // command line usage error
-	ExConfig = 78 // configuration error
+	ExUsage    = 65 // command line usage error
+	ExConfig   = 78 // configuration error
+	ExSoftware = 70 // internal software error
 )
