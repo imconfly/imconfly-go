@@ -10,8 +10,8 @@ import (
 )
 
 type Container struct {
-	Origin     origin.Origin
-	Transforms map[string]transform.Transform
+	Origin     origin.Origin                  `yaml:"Origin"`
+	Transforms map[string]transform.Transform `yaml:"Transforms"`
 }
 
 // Containers - origins and transforms configuration

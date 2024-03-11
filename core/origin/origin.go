@@ -24,9 +24,9 @@ const (
 var TypeError = errors.New("wrong origin type")
 
 type Origin struct {
-	Source    string
-	Transport string
-	Access    bool
+	Source    string `yaml:"Source"`
+	Transport string `yaml:"Transport"`
+	Access    bool   `yaml:"Access"`
 }
 
 func (o *Origin) GetType() string {

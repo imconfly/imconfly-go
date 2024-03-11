@@ -5,11 +5,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"strings"
+
+	log "github.com/sirupsen/logrus"
+
 	"github.com/imconfly/imconfly_go/config"
 	"github.com/imconfly/imconfly_go/constants"
 	"github.com/imconfly/imconfly_go/server"
-	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 const (
@@ -125,6 +128,16 @@ func getConf() *config.Conf {
 		confFile = defaultConfFile
 	}
 
+	var yamlFormat bool
+	if strings.HasSuffix(confFile, ".json") {
+		yamlFormat = false
+	} else if strings.HasSuffix(confFile, ".yaml") {
+		yamlFormat = true
+	} else {
+		fmt.Fprintln(os.Stderr, `Config file name must ends with ".json" or ".yaml"`)
+		os.Exit(constants.ExConfig)
+	}
+
 	f, err := os.Open(confFile)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
@@ -132,7 +145,7 @@ func getConf() *config.Conf {
 	}
 	defer f.Close()
 
-	c, err := config.ReadConf(f)
+	c, err := config.ReadConf(f, yamlFormat)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(constants.ExConfig)

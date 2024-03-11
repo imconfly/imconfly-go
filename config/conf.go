@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io"
 	"runtime"
 
@@ -10,15 +11,15 @@ import (
 )
 
 type Conf struct {
-	TransformConcurrency int
-	DataDir              o.DirAbsPath
-	TmpDir               o.DirAbsPath
-	ServerHost           string
-	ServerPort           int
-	Containers           Containers
+	TransformConcurrency int          `yaml:"TransformConcurrency"`
+	DataDir              o.DirAbsPath `yaml:"DataDir"`
+	TmpDir               o.DirAbsPath `yaml:"TmpDir"`
+	ServerHost           string       `yaml:"ServerHost"`
+	ServerPort           int          `yaml:"ServerPort"`
+	Containers           Containers   `yaml:"Containers"`
 }
 
-func ReadConf(reader io.Reader) (*Conf, error) {
+func ReadConf(reader io.Reader, yamlFormat bool) (*Conf, error) {
 	// defaults
 	conf := &Conf{
 		TransformConcurrency: runtime.NumCPU(),
@@ -33,8 +34,14 @@ func ReadConf(reader io.Reader) (*Conf, error) {
 		return nil, err
 	}
 
-	if err = json.Unmarshal(b, conf); err != nil {
-		return nil, fmt.Errorf("JSON parser error: %w", err)
+	if yamlFormat {
+		if err = yaml.Unmarshal(b, conf); err != nil {
+			return nil, fmt.Errorf("JSON parser error: %w", err)
+		}
+	} else {
+		if err = json.Unmarshal(b, conf); err != nil {
+			return nil, fmt.Errorf("JSON parser error: %w", err)
+		}
 	}
 
 	// check containers for correct configuration
