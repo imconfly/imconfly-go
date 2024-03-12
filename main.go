@@ -20,20 +20,6 @@ const (
 	confFileEnvVar  = "IMCONFLY_CONF_FILE"
 )
 
-const usageTxt = `imconfly is a web server for on-the-fly data conversion.
-
-Usage:
-  imconfly <command>
-
-Commands:
-  serve    run HTTP server
-  exec     works like HTTP query but print target filename in stdout
-  version  print version
-  conf     print current configuration in JSON format
-
-Use "imconfly help <command>" for more information about a command.
-`
-
 // main
 // functions like *Command must manage output to stdout and stderr by itself
 // and call os.Exit() finally
@@ -67,13 +53,6 @@ func main() {
 	}
 }
 
-// wrongUsage
-// show usage text end exit with EX_USAGE code
-func wrongUsage() {
-	fmt.Print(usageTxt)
-	os.Exit(constants.ExUsage)
-}
-
 func serveCommand() {
 	c := getConf()
 	if err := config.CheckDirs(c.DataDir, c.TmpDir); err != nil {
@@ -89,25 +68,6 @@ func serveCommand() {
 func versionCommand() {
 	fmt.Println(constants.Version)
 	os.Exit(0)
-}
-
-func helpCommand(subCommand string) {
-	if subCommand == "" { // just "imconfly help"
-		fmt.Print(usageTxt)
-		os.Exit(0)
-	}
-	switch subCommand {
-	case "serve":
-		fallthrough
-	case "exec":
-		fallthrough
-	case "version":
-		fallthrough
-	case "conf":
-		fmt.Fprintf(os.Stderr, "not implemented yet\n")
-		os.Exit(70)
-	}
-	wrongUsage()
 }
 
 func confCommand() {
