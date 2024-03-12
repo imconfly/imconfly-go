@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"fmt"
@@ -21,14 +21,14 @@ Commands:
 Use "imconfly help <command>" for more information about a command.
 `
 
-// wrongUsage
+// WrongUsage
 // show usage text end exit with EX_USAGE code
-func wrongUsage() {
+func WrongUsage() {
 	fmt.Print(usageTxt)
 	os.Exit(constants.ExUsage)
 }
 
-func helpCommand(subCommand string) {
+func Help(subCommand string) {
 	if subCommand == "" { // just "imconfly help"
 		fmt.Print(usageTxt)
 		os.Exit(0)
@@ -44,5 +44,5 @@ func helpCommand(subCommand string) {
 		fmt.Fprintf(os.Stderr, "not implemented yet\n")
 		os.Exit(constants.ExSoftware)
 	}
-	wrongUsage()
+	WrongUsage()
 }
